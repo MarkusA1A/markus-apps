@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Autismus-Screening">
+    <meta name="theme-color" content="#667eea">
+    <meta name="description" content="Autismus-Screening-Tool basierend auf DSM-5 Kriterien. Erste Orientierung zur Autismus-Spektrum-Störung (ASS). Vollständig offline, keine Datenspeicherung.">
+    <link rel="manifest" href="autismus-screening-manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23667eea' width='192' height='192'/><text x='96' y='120' font-size='100' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'>🧠</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23667eea' width='180' height='180'/><text x='90' y='135' font-size='100' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'>🧠</text></svg>">
+    <title>Autismus-Screening-Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Info Screen */
+        .info-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 24px;
+            text-align: center;
+        }
+
+        .info-screen h1 {
+            font-size: 32px;
+            color: #667eea;
+            margin-bottom: 12px;
+        }
+
+        .info-screen p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 12px;
+        }
+
+        .privacy-section {
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: left;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .privacy-section h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .privacy-section p {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .privacy-section ul {
+            font-size: 13px;
+            color: #666;
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .privacy-section li {
+            margin-bottom: 6px;
+        }
+
+        /* Button Styles */
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 12px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Question Screen */
+        .question-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .question-counter {
+            font-size: 13px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        .question-container {
+            flex: 1;
+        }
+
+        .question-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+            text-align: left;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .option input[type="radio"] {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .option:hover {
+            background: #f0f0f0;
+            border-color: #667eea;
+        }
+
+        .option input[type="radio"]:checked + label,
+        .option.selected {
+            background: #e8eaf6;
+            border-color: #667eea;
+            font-weight: 500;
+        }
+
+        .option label {
+            cursor: pointer;
+            display: block;
+            width: 100%;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            margin-top: 24px;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 14px;
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .nav-button:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 20px;
+        }
+
+        .result-screen h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .score-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .score-number {
+            font-size: 64px;
+            font-weight: 700;
+            margin: 12px 0;
+        }
+
+        .score-label {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .interpretation {
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .interpretation h3 {
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .interpretation p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .interpretation strong {
+            color: #333;
+        }
+
+        .reset-button {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            margin-top: 12px;
+        }
+
+        /* Hidden by default */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* iPad Optimization */
+        @media (min-width: 1024px) {
+            .container {
+                padding: 60px;
+                min-height: 700px;
+            }
+
+            .question-title {
+                font-size: 24px;
+            }
+
+            .option {
+                padding: 20px;
+                padding-left: 56px;
+                font-size: 18px;
+            }
+
+            .option input[type="radio"] {
+                width: 24px;
+                height: 24px;
+                left: 18px;
+            }
+
+            button {
+                padding: 16px 36px;
+                font-size: 18px;
+            }
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px;
+                border-radius: 16px;
+            }
+
+            .info-screen h1 {
+                font-size: 24px;
+            }
+
+            .question-title {
+                font-size: 18px;
+            }
+
+            .option {
+                padding: 14px;
+                padding-left: 46px;
+                font-size: 15px;
+            }
+
+            .score-number {
+                font-size: 48px;
+            }
+
+            button {
+                padding: 12px 24px;
+                font-size: 15px;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            }
+
+            .container {
+                background: #222;
+                color: #e0e0e0;
+            }
+
+            .question-title {
+                color: #e0e0e0;
+            }
+
+            .info-screen p {
+                color: #b0b0b0;
+            }
+
+            .option {
+                background: #333;
+                border-color: #444;
+                color: #e0e0e0;
+            }
+
+            .option:hover {
+                background: #3a3a3a;
+                border-color: #667eea;
+            }
+
+            .option.selected {
+                background: #3d4477;
+                border-color: #667eea;
+            }
+
+            .privacy-section {
+                background: #333;
+                color: #b0b0b0;
+            }
+
+            .privacy-section p, .privacy-section ul {
+                color: #b0b0b0;
+            }
+
+            .interpretation {
+                background: #333;
+                color: #b0b0b0;
+            }
+
+            .interpretation p {
+                color: #b0b0b0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Info Screen -->
+        <div class="screen info-screen active">
+            <div>
+                <h1>🧠 Autismus-Screening</h1>
+                <p>Dieses Tool bietet eine erste Orientierung basierend auf den DSM-5 Kriterien für Autismus-Spektrum-Störung (ASS).</p>
+                
+                <div class="privacy-section">
+                    <h3>📋 Datenschutz & Nutzungshinweis</h3>
+                    <p><strong>Anonymität:</strong> Dieses Tool speichert keine Daten. Jede Session wird sofort nach Fertigstellung gelöscht.</p>
+                    <ul>
+                        <li>Keine Logins oder Konten erforderlich</li>
+                        <li>Keine Cookies oder Tracking</li>
+                        <li>Keine Speicherung von Antworten</li>
+                        <li>Funktioniert vollständig offline nach dem Laden</li>
+                    </ul>
+                    <p style="margin-top: 12px;"><strong>Medizinischer Hinweis:</strong> Dieses Screening ist <strong>kein Diagnose-Tool</strong>. Es kann nur eine erste Orientierung geben. Eine gültige Diagnose kann nur von einem Facharzt oder klinischen Psychologen gestellt werden.</p>
+                    <p style="margin-top: 12px;">Die Fragen basieren auf DSM-5 Kriterien für Autismus-Spektrum-Störung und decken folgende Bereiche ab:</p>
+                    <ul>
+                        <li>Soziale Kommunikation & Interaktion</li>
+                        <li>Begrenzte, wiederholte Verhaltensmuster</li>
+                        <li>Sensorische Besonderheiten</li>
+                    </ul>
+                </div>
+
+                <p><strong>Dauer:</strong> Ca. 10-15 Minuten</p>
+            </div>
+            <button onclick="startTest()">Verstanden – Starten</button>
+        </div>
+
+        <!-- Question Screen -->
+        <div class="screen question-screen">
+            <div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="question-counter"><span id="currentQuestion">1</span> / <span id="totalQuestions">50</span></div>
+            </div>
+
+            <div class="question-container">
+                <div id="categoryBadge" class="category-badge"></div>
+                <div class="question-title" id="questionText"></div>
+                <div class="options" id="optionsContainer"></div>
+            </div>
+
+            <div class="navigation">
+                <button class="nav-button" id="prevBtn" onclick="previousQuestion()" disabled>← Zurück</button>
+                <button class="nav-button" id="nextBtn" onclick="nextQuestion()">Weiter →</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="screen result-screen">
+            <h2>🎯 Ihre Ergebnisse</h2>
+            
+            <div class="score-box">
+                <div class="score-label">Gesamtpunktzahl</div>
+                <div class="score-number" id="finalScore">0</div>
+                <div class="score-label" id="maxScore">(max. 250)</div>
+            </div>
+
+            <div class="interpretation" id="interpretationBox"></div>
+
+            <button class="reset-button" onclick="resetTest()">🔄 Von vorne</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // SERVICE WORKER REGISTRATION
+        // ============================================
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('autismus-screening-sw.js').catch(err => {
+                console.log('Service Worker registration failed:', err);
+            });
+        }
+
+        // Questions Database (50 questions)
+        const questions = [
+            // Soziale Kommunikation & Interaktion (20 Fragen)
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Mir fällt es schwer, natürliche Blickkontakte zu halten während eines Gesprächs.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Ich habe Schwierigkeiten, die emotionalen Reaktionen anderer Menschen zu verstehen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Mir fehlt das Interesse an sozialen Aktivitäten, die andere Menschen genießen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Ich habe Schwierigkeiten, tiefe Freundschaften zu entwickeln.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Meine Stimme klingt ungewöhnlich oder monoton.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Ich habe Schwierigkeiten, Small Talk zu führen oder informelle Unterhaltungen zu beginnen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Mir fällt es schwer, auf Hinweise von anderen in sozialen Situationen zu reagieren.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Ich interpretiere Gesichtsausdrücke oder Gesten falsch.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Ich spreche oft über meine Lieblingsthemen, ohne auf das Interesse anderer zu achten.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Ich bevorzuge es, Zeit allein zu verbringen, statt mit anderen zu interagieren.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Ich habe Schwierigkeiten, die unausgesprochenen Regeln in sozialen Situationen zu verstehen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Mir fällt es schwer, rollengerechtes Verhalten in verschiedenen Situationen zu zeigen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Meine sozialen Beziehungen scheinen oberflächlich zu sein.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Ich habe Schwierigkeiten, mich in andere Menschen hineinzuversetzen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Ich finde es anstrengend, an Gruppenaktivitäten oder Partys teilzunehmen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Ich habe Schwierigkeiten, wann ich sprechen soll und wann nicht.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Menschen wirken oft verwirrt von meinen Reaktionen in sozialen Situationen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Ich habe Schwierigkeiten, Witze zu verstehen oder mitzumachen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Soziale Kommunikation & Interaktion",
+                text: "Ich präferiere sehr spezifische oder technische Themen gegenüber allgemeinem Smalltalk.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+
+            // Begrenzte, wiederholte Verhaltensmuster (20 Fragen)
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Ich habe intensive Interessen, mit denen ich mich viel beschäftige.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Ich muss Dinge in einer bestimmten Reihenfolge oder auf eine bestimmte Weise tun.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Ich führe wiederholte Bewegungen oder Gesten durch (z.B. Flattern, Drehen).",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Ich habe ein starkes Bedürfnis nach Konsistenz und Routine.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Mich frustrieren unerwartete Veränderungen in meiner Tagesroutine.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Ich interessiere mich obsessiv für bestimmte Objekte oder Details.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Ich wiederhole häufig Wörter, Sätze oder Sounds.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Ich arrangiere und reorganisiere Objekte auf eine bestimmte Art.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Ich finde es schwierig, meine Aufmerksamkeit von spezifischen Aktivitäten abzuwenden.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Meine Interessen sind sehr spezialisiert und eng gefasst.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Ich habe Rituale, die ich durchführen muss, um mich beruhigt zu fühlen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Ich habe repetitive Bewegungsmuster, die ich im Stressfall verstärke.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Ich verwende oft immer wieder die gleichen Sätze oder Reaktionen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Veränderungen in meiner Umgebung bringen mich aus dem Gleichgewicht.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Ich konzentriere mich intensiv auf spezifische, begrenzte Aktivitäten.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Ich muss Dinge in einer bestimmten Anzahl oder Muster tun (z.B. 3-mal, in Paaren).",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Begrenzte, wiederholte Verhaltensmuster",
+                text: "Meine Lieblingsbeschäftigungen sind sehr repetitiv oder ritualistisch.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+
+            // Sensorische Besonderheiten (10 Fragen)
+            {
+                category: "Sensorische Besonderheiten",
+                text: "Bestimmte Geräusche sind für mich unerträglich laut oder störend.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Sensorische Besonderheiten",
+                text: "Helle Lichter oder Bildschirme verursachen mir Unbehagen oder Kopfschmerzen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Sensorische Besonderheiten",
+                text: "Ich bin empfindlich gegenüber bestimmten Texturen oder Stoffen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Sensorische Besonderheiten",
+                text: "Ich habe Probleme mit Gerüchen, die andere nicht wahrnehmen oder stören.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Sensorische Besonderheiten",
+                text: "Bestimmte Lebensmittel habe ich nicht, obwohl ich weiß, dass ich sie mag, wegen ihrer Konsistenz.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Sensorische Besonderheiten",
+                text: "Ich bin empfindlich gegenüber bestimmten Geschmacksstoffen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Sensorische Besonderheiten",
+                text: "Ich meide eng sitzende Kleidung oder bestimmte Materialien auf meiner Haut.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Sensorische Besonderheiten",
+                text: "Ich bemerke Details oder Muster, die andere übersehen.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Sensorische Besonderheiten",
+                text: "Ich bin überempfindlich gegen bestimmte sensorische Reize in meiner Umgebung.",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            },
+            {
+                category: "Sensorische Besonderheiten",
+                text: "Ich komme schwer mit einer Mischung von Sinnesreizen zurecht (z.B. laute Musik + Menschenmenge).",
+                options: [
+                    { text: "Trifft gar nicht zu", score: 0 },
+                    { text: "Trifft eher nicht zu", score: 1 },
+                    { text: "Teils/teils", score: 2 },
+                    { text: "Trifft eher zu", score: 3 },
+                    { text: "Trifft vollständig zu", score: 4 }
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let scores = new Array(questions.length).fill(null);
+
+        function startTest() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelector('.question-screen').classList.add('active');
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById('questionText').textContent = question.text;
+            document.getElementById('categoryBadge').textContent = question.category;
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('totalQuestions').textContent = questions.length;
+
+            // Update progress bar
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // Render options
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                if (scores[currentQuestionIndex] !== null && scores[currentQuestionIndex] === option.score) {
+                    optionDiv.classList.add('selected');
+                }
+
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'option';
+                input.value = option.score;
+                input.checked = scores[currentQuestionIndex] !== null && scores[currentQuestionIndex] === option.score;
+                input.onchange = () => selectOption(option.score);
+
+                const label = document.createElement('label');
+                label.textContent = option.text;
+
+                optionDiv.appendChild(input);
+                optionDiv.appendChild(label);
+                optionDiv.onclick = () => {
+                    input.checked = true;
+                    selectOption(option.score);
+                };
+
+                container.appendChild(optionDiv);
+            });
+
+            // Update button states
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            document.getElementById('nextBtn').textContent = currentQuestionIndex === questions.length - 1 ? 'Ergebnis anzeigen' : 'Weiter →';
+        }
+
+        function selectOption(score) {
+            scores[currentQuestionIndex] = score;
+            displayQuestion();
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (scores[currentQuestionIndex] === null) {
+                alert('Bitte wählen Sie eine Antwort aus, bevor Sie weitergehen.');
+                return;
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            const totalScore = scores.reduce((sum, score) => sum + score, 0);
+            
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelector('.result-screen').classList.add('active');
+
+            document.getElementById('finalScore').textContent = totalScore;
+
+            // Determine interpretation
+            let interpretation = '';
+            let severity = '';
+
+            if (totalScore <= 50) {
+                severity = 'Niedrig';
+                interpretation = 'Ihre Ergebnisse zeigen nur wenige Merkmale, die mit Autismus-Spektrum-Störung assoziiert sind. Eine fachliche Bewertung könnte dennoch hilfreich sein, wenn Sie spezifische Bedenken haben.';
+            } else if (totalScore <= 100) {
+                severity = 'Mittelmäßig';
+                interpretation = 'Ihre Ergebnisse deuten auf einige Merkmale hin, die mit Autismus-Spektrum-Störung assoziiert sind. Eine professionelle Bewertung durch einen Facharzt ist empfohlen.';
+            } else if (totalScore <= 150) {
+                severity = 'Hoch';
+                interpretation = 'Ihre Ergebnisse zeigen mehrere Merkmale, die stark mit Autismus-Spektrum-Störung assoziiert sind. Eine gründliche professionelle Bewertung ist dringend empfohlen.';
+            } else {
+                severity = 'Sehr hoch';
+                interpretation = 'Ihre Ergebnisse deuten auf starke Merkmale hin, die mit Autismus-Spektrum-Störung assoziiert sind. Eine sofortige Konsultation mit einem Spezialisten wird empfohlen.';
+            }
+
+            const interpretationHTML = `
+                <h3>Interpretation (${severity})</h3>
+                <p>${interpretation}</p>
+                <p style="margin-top: 12px; font-size: 14px;"><strong>Wichtig:</strong> Dieses Tool ersetzt keine medizinische Diagnose. Nur ein Facharzt oder klinischer Psychologe kann eine gültige Diagnose stellen. Falls Sie weitere Unterstützung benötigen, konsultieren Sie einen Fachmann.</p>
+            `;
+
+            document.getElementById('interpretationBox').innerHTML = interpretationHTML;
+        }
+
+        function resetTest() {
+            currentQuestionIndex = 0;
+            scores = new Array(questions.length).fill(null);
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelector('.info-screen').classList.add('active');
+        }
+
+        // Initialize
+        document.getElementById('totalQuestions').textContent = questions.length;
+    </script>
+</body>
+</html>

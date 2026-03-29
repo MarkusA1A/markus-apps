@@ -1,0 +1,56 @@
+{
+  "name": "Autismus-Screening-Tool",
+  "short_name": "Autismus-Screen",
+  "description": "DSM-5 basiertes Autismus-Screening-Tool für erste Orientierung zur Autismus-Spektrum-Störung. Vollständig offline, anonymisiert, keine Datenspeicherung. Achtung: Kein Diagnose-Tool!",
+  "start_url": "autismus-screening.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#667eea",
+  "categories": ["medical", "utilities"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23667eea' width='192' height='192'/><text x='96' y='120' font-size='100' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'>🧠</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23667eea' width='512' height='512'/><text x='256' y='340' font-size='280' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'>🧠</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23667eea' width='180' height='180' rx='40'/><text x='90' y='135' font-size='100' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'>🧠</text></svg>",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%23667eea;stop-opacity:1' /><stop offset='100%' style='stop-color:%23764ba2;stop-opacity:1' /></linearGradient></defs><rect fill='url(%23grad)' width='540' height='720'/><rect fill='white' y='60' width='540' height='600'/><text x='270' y='150' font-size='36' font-weight='bold' text-anchor='middle' fill='%23667eea' font-family='Arial'>Autismus-Screening</text><text x='270' y='250' font-size='20' text-anchor='middle' fill='%23666' font-family='Arial'>🧠 Erste Orientierung</text><text x='270' y='300' font-size='20' text-anchor='middle' fill='%23666' font-family='Arial'>💬 50 DSM-5 Fragen</text><text x='270' y='350' font-size='20' text-anchor='middle' fill='%23666' font-family='Arial'>🔒 Vollständig anonym</text><text x='270' y='400' font-size='16' text-anchor='middle' fill='%23999' font-family='Arial'>Offline-fähig • Keine Datenspeicherung</text></svg>",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Test starten",
+      "short_name": "Screening",
+      "description": "Starte das Autismus-Screening-Test sofort",
+      "url": "autismus-screening.html",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23667eea' width='192' height='192'/><text x='96' y='120' font-size='100' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'>🧠</text></svg>",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}
