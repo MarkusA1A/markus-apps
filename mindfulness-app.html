@@ -1035,55 +1035,43 @@
             },
 
             playBellSound() {
-                // Play warm, resonant meditation bell using Web Audio API
+                // Play recorded meditation bell sound
+                try {
+                    const tingshaAudio = document.getElementById('tingshaAudio');
+                    if (tingshaAudio) {
+                        tingshaAudio.volume = 0.8;
+                        tingshaAudio.currentTime = 0;
+                        tingshaAudio.play().catch(err => {
+                            console.log('Bell audio play failed, trying Web Audio fallback:', err);
+                            this.playBellFallback();
+                        });
+                    } else {
+                        this.playBellFallback();
+                    }
+                } catch (err) {
+                    console.log('Bell sound error:', err);
+                    this.playBellFallback();
+                }
+            },
+            
+            playBellFallback() {
+                // Fallback: Web Audio API synthesis
                 try {
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     const now = audioContext.currentTime;
-                    
-                    // Fundamental tone (G4, 392 Hz) - warm base
-                    const osc1 = audioContext.createOscillator();
-                    const gain1 = audioContext.createGain();
-                    osc1.connect(gain1);
-                    gain1.connect(audioContext.destination);
-                    
-                    osc1.frequency.setValueAtTime(392, now);
-                    osc1.frequency.exponentialRampToValueAtTime(370, now + 3);
-                    osc1.type = 'sine';
-                    gain1.gain.setValueAtTime(0.25, now);
-                    gain1.gain.exponentialRampToValueAtTime(0.001, now + 3.5);
-                    
-                    // Second harmonic (2x) - adds warmth
-                    const osc2 = audioContext.createOscillator();
-                    const gain2 = audioContext.createGain();
-                    osc2.connect(gain2);
-                    gain2.connect(audioContext.destination);
-                    
-                    osc2.frequency.setValueAtTime(784, now);
-                    osc2.frequency.exponentialRampToValueAtTime(740, now + 2.5);
-                    osc2.type = 'sine';
-                    gain2.gain.setValueAtTime(0.15, now);
-                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 3);
-                    
-                    // Third harmonic (3x) - brightness
-                    const osc3 = audioContext.createOscillator();
-                    const gain3 = audioContext.createGain();
-                    osc3.connect(gain3);
-                    gain3.connect(audioContext.destination);
-                    
-                    osc3.frequency.setValueAtTime(1176, now);
-                    osc3.frequency.exponentialRampToValueAtTime(1100, now + 2);
-                    osc3.type = 'sine';
-                    gain3.gain.setValueAtTime(0.08, now);
-                    gain3.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
-                    
-                    osc1.start(now);
-                    osc2.start(now);
-                    osc3.start(now);
-                    osc1.stop(now + 3.5);
-                    osc2.stop(now + 3.5);
-                    osc3.stop(now + 3.5);
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.frequency.setValueAtTime(392, now);
+                    osc.frequency.exponentialRampToValueAtTime(370, now + 2);
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 2);
+                    osc.start(now);
+                    osc.stop(now + 2);
                 } catch (err) {
-                    console.log('Bell sound could not be played:', err);
+                    console.log('Fallback bell also failed:', err);
                 }
             },
 
