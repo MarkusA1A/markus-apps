@@ -895,10 +895,7 @@
                     return;
                 }
 
-                // Play bell immediately on start
-                this.playBellSound();
-                
-                // Show 10-second countdown screen
+                // Show 10-second countdown screen (bell plays when meditation starts)
                 this.showCountdownScreen();
             },
 
@@ -947,6 +944,9 @@
 
                 document.getElementById('startBtn').disabled = true;
                 document.getElementById('pauseBtn').disabled = false;
+
+                // Play single bell when meditation starts
+                this.playBellSound();
 
                 // Schedule double bell at 10 seconds before end
                 const bellTime = (this.totalTime - 10) * 1000;
