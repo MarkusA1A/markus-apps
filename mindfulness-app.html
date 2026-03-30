@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Achtsamkeits-App basierend auf Jon Kabat-Zinn MBSR-Techniken">
+    <meta name="theme-color" content="#1e88e5">
+    <title>Mindfulness — Achtsamkeit & Meditation</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Mindfulness%20App%22%2C%22short_name%22%3A%22Mindfulness%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%231e88e5%22%2C%22scope%22%3A%22%2F%22%7D">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%231e88e5' width='192' height='192'/%3E%3Ctext x='96' y='120' font-size='96' fill='white' text-anchor='middle' font-family='Arial'%3E🧘%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%231e88e5' width='192' height='192'/%3E%3Ctext x='96' y='120' font-size='96' fill='white' text-anchor='middle' font-family='Arial'%3E🧘%3C/text%3E%3C/svg%3E">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e88e5;
+            --primary-dark: #1565c0;
+            --accent: #26a69a;
+            --accent-light: #4db8a8;
+            --bg: #ffffff;
+            --surface: #f5f5f5;
+            --text: #212121;
+            --text-secondary: #757575;
+            --border: #e0e0e0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #121212;
+                --surface: #1e1e1e;
+                --text: #ffffff;
+                --text-secondary: #b0b0b0;
+                --border: #333333;
+                --shadow: 0 2px 8px rgba(0,0,0,0.3);
+                --shadow-lg: 0 4px 16px rgba(0,0,0,0.5);
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        nav button {
+            padding: 0.6rem 1.2rem;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        nav button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        nav button:hover:not(.active) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Sections */
+        section {
+            display: none;
+        }
+
+        section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Gallery */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .card-duration {
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Meditation Player */
+        .player {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .player h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .player-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        /* Time Selection */
+        .time-selector {
+            display: flex;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .time-btn {
+            padding: 0.6rem 1.2rem;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .time-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .time-btn.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Meditation Script */
+        .meditation-script {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            max-height: 300px;
+            overflow-y: auto;
+            border-left: 4px solid var(--accent);
+            font-style: italic;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        /* Timer */
+        .timer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .timer-display {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-variant-numeric: tabular-nums;
+            margin: 1rem 0;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        button {
+            padding: 0.8rem 1.6rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-light);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c62828;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 3px;
+            transition: width 0.1s linear;
+        }
+
+        /* Statistics */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* History */
+        .history-list {
+            list-style: none;
+        }
+
+        .history-item {
+            background: var(--surface);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--accent);
+        }
+
+        .history-item-info h4 {
+            margin-bottom: 0.25rem;
+        }
+
+        .history-item-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .history-item-duration {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            min-width: 80px;
+            text-align: right;
+        }
+
+        /* Breathing Exercise */
+        .breath-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: var(--primary);
+            margin: 2rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            animation: breathe 8s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+        }
+
+        .breath-circle.paused {
+            animation: none;
+            transform: scale(1);
+            opacity: 0.8;
+        }
+
+        /* Yoga Poses */
+        .pose-list {
+            list-style: none;
+        }
+
+        .pose-item {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .pose-item h4 {
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .pose-item p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Walking Meditation */
+        .pace-display {
+            font-size: 2rem;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--surface);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid var(--accent);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            main {
+                padding: 1.5rem 1rem;
+            }
+
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+
+            .timer-display {
+                font-size: 3rem;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .notification {
+                bottom: 1rem;
+                right: 1rem;
+                left: 1rem;
+            }
+
+            nav {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        /* Utility */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt {
+            margin-top: 2rem;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 2rem 0;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--surface);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧘 Mindfulness</h1>
+            <p>Achtsamkeit & Meditation nach Jon Kabat-Zinn</p>
+        </header>
+
+        <main>
+            <!-- Navigation -->
+            <nav id="nav">
+                <button class="nav-btn active" data-section="home">Übungen</button>
+                <button class="nav-btn" data-section="meditate">Meditation</button>
+                <button class="nav-btn" data-section="history">Protokoll</button>
+                <button class="nav-btn" data-section="info">Info</button>
+            </nav>
+
+            <!-- Home Section -->
+            <section id="home" class="active">
+                <h2 style="margin-bottom: 1.5rem;">Wähle deine Achtsamkeitsübung</h2>
+                <div class="gallery" id="gallery"></div>
+            </section>
+
+            <!-- Meditation Section -->
+            <section id="meditate">
+                <div class="player">
+                    <h2 id="playerTitle">Atemmeditation</h2>
+                    <div class="player-icon" id="playerIcon">🧘</div>
+
+                    <div class="time-selector" id="timeSelector"></div>
+
+                    <div class="meditation-script" id="meditationScript"></div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+
+                    <div class="timer">
+                        <div class="timer-display" id="timerDisplay">00:00</div>
+                        <div class="pace-display hidden" id="paceDisplay"></div>
+                        <div class="breath-circle hidden" id="breathCircle">Atme...</div>
+                    </div>
+
+                    <div class="timer-controls">
+                        <button class="btn-primary" id="startBtn" onclick="app.startMeditation()">Starten</button>
+                        <button class="btn-secondary" id="pauseBtn" onclick="app.pauseMeditation()" disabled>Pause</button>
+                        <button class="btn-outline" id="resetBtn" onclick="app.resetMeditation()">Zurücksetzen</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section id="history">
+                <h2>Deine Achtsamkeitssitzungen</h2>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalSessions">0</div>
+                        <div class="stat-label">Sitzungen</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalMinutes">0</div>
+                        <div class="stat-label">Minuten</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="currentStreak">0</div>
+                        <div class="stat-label">Tage Serie</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="thisWeek">0</div>
+                        <div class="stat-label">Diese Woche</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Letzte Aktivität</h3>
+                <ul class="history-list" id="historyList">
+                    <li style="text-align: center; color: var(--text-secondary);">Keine Sitzungen noch. Fang an!</li>
+                </ul>
+
+                <button class="btn-danger" onclick="app.clearHistory()" style="margin-top: 2rem;">Alle löschen</button>
+            </section>
+
+            <!-- Info Section -->
+            <section id="info">
+                <h2>Über diese App</h2>
+                <div style="max-width: 600px; margin: 2rem auto;">
+                    <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">Was ist MBSR?</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Mindfulness-Based Stress Reduction (MBSR) ist ein achtköchiges Programm von Jon Kabat-Zinn, das Stress, Angst und chronische Schmerzen durch Achtsamkeitsmeditation lindert.
+                    </p>
+
+                    <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">Kernpraktiken</h3>
+                    <ul style="margin-left: 1.5rem; color: var(--text-secondary); line-height: 1.8;">
+                        <li><strong>Body Scan:</strong> Systematische Aufmerksamkeit durch den Körper</li>
+                        <li><strong>Atemmeditation:</strong> Fokus auf natürlichen Atemsfluss</li>
+                        <li><strong>Sitzmeditation:</strong> Stille Achtsamkeit</li>
+                        <li><strong>Walking Meditation:</strong> Bewusstes Gehen</li>
+                        <li><strong>Hatha Yoga:</strong> Sanfte körperliche Praxis</li>
+                        <li><strong>Atemtechniken:</strong> Spezifische Atemübungen</li>
+                    </ul>
+
+                    <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">Tipps für deine Praxis</h3>
+                    <ul style="margin-left: 1.5rem; color: var(--text-secondary); line-height: 1.8;">
+                        <li>Wähle einen ruhigen Ort, frei von Ablenkungen</li>
+                        <li>Sitze aufrecht, entspannt oder auf dem Boden</li>
+                        <li>Starte mit kurzen Sitzungen (5-10 Min)</li>
+                        <li>Übe regelmäßig, idealerweise täglich</li>
+                        <li>Es gibt kein "Richtig" oder "Falsch" — Akzeptanz ist der Weg</li>
+                    </ul>
+
+                    <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">Datenschutz</h3>
+                    <p style="color: var(--text-secondary);">
+                        Diese App speichert deine Sitzungen nur lokal auf deinem Gerät. Es werden keine Daten an externe Server gesendet. Du kannst deine Historie jederzeit löschen.
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Mindfulness App | Basierend auf Jon Kabat-Zinn MBSR | <a href="#" onclick="app.registerServiceWorker()">Offline verfügbar</a></p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem;">Nicht für medizinische Ratschläge bestimmt. Konsultiere einen Fachmann bei gesundheitlichen Bedenken.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Meditation Content
+        const meditations = {
+            bodyScan: {
+                title: 'Body Scan',
+                icon: '🧘',
+                description: 'Systematische Entspannung aller Körperteile',
+                durations: [30, 45],
+                script: `Setze dich bequem hin oder lege dich hin. Schließe sanft deine Augen. Beginne damit, deine Aufmerksamkeit auf die Spitze deines Kopfes zu richten. Beobachte alle Empfindungen ohne Urteil. Langsam bewege dein Bewusstsein nach unten: Stirn, Augen, Nase, Mund, Kinn. Jetzt zur Kehle, Nacken, Schultern. Spüre die Spannung und lasse sie los. Bewege deine Aufmerksamkeit zu deinen Armen, Unterarmen, Händen und Fingern. Fühle jeden Finger einzeln. Jetzt zu deiner Brust. Atme tief ein und aus. Spüre deinen Herzbeat. Bewege deine Aufmerksamkeit zu deinem Bauch und deinen Hüften. Beobachte, wie sich dein Bauch mit jedem Atemzug bewegt. Jetzt zu deinem unteren Rücken. Entspanne die Muskeln dort. Bewege dich weiter zu deinen Oberschenkeln, Knien, Waden und Füßen. Spüre den Kontakt deiner Füße mit dem Boden. Durchlaufe deinen ganzen Körper nochmal mit Wohlwollen und Dankbarkeit. Bleibe in diesem Zustand der Ruhe und Frieden.`
+            },
+            breathMeditation: {
+                title: 'Atemmeditation',
+                icon: '💨',
+                description: 'Fokus auf deinen natürlichen Atem',
+                durations: [5, 10, 20],
+                script: `Finde eine bequeme Sitzhaltung. Lass deine Augen sanft schließen. Atme natürlich durch deine Nase ein und aus. Du brauchst deinen Atem nicht zu kontrollieren — nur zu beobachten. Spüre, wie die Luft in deine Nase eindringt. Spüre die kühle Luft, wenn du einatmest. Und die wärmere Luft, wenn du ausatmest. Folge dem kompletten Atemzyklus. Wenn dein Geist abschweift — und das wird er — bringe ihn sanft zurück zum Atem. Das ist nicht Versagen, das ist die Praxis. Mit jedem Atemzug werden du ruhiger und präsenter. Bleibe mit deinem Atem verbunden.`
+            },
+            sitMeditation: {
+                title: 'Sitzmeditation',
+                icon: '🙏',
+                description: 'Stille Achtsamkeit und innerer Frieden',
+                durations: [10, 20, 30],
+                script: `Sitze aufrecht mit geschlossenen Augen. Deine Wirbelsäule ist gerade, aber nicht verkrampft. Deine Hände ruhen entspannt auf deinen Knien oder in deinem Schoß. Atme tief ein paar Mal ein und aus, um dich zu entspannen. Beobachte deinen natürlichen Atem. Du beobachtest einfach — keine Veränderung, keine Kontrolle. Wenn Gedanken auftauchen, beobachte sie wie Wolken am Himmel — sie kommen und gehen. Urteile nicht. Beteilige dich nicht. Kehre zum gegenwärtigen Moment zurück. Mit jeder Minute werden du stiller, friedlicher, präsenter. Du bist hier. Du bist sicher. Du bist im Frieden.`
+            },
+            walkingMeditation: {
+                title: 'Walking Meditation',
+                icon: '🚶',
+                description: 'Bewusstes Gehen in voller Achtsamkeit',
+                durations: [10, 15, 20],
+                script: `Stelle dich auf einen freien Platz. Lass deine Augen offen und richte deinen Blick sanft nach unten. Gehe langsam und absichtlich. Spüre jeden Fuß, der den Boden berührt. Links, Rechts, Links. Mit jedem Schritt bist du im gegenwärtigen Moment. Beobachte, wie deine Muskeln arbeiten. Beobachte dein Gleichgewicht. Wenn dein Geist wandert, bringe ihn sanft zum Gefühl des Gehens zurück. Es gibt kein Ziel, nur die Bewegung. Gehe mit Absicht. Mit Achtsamkeit. Mit Dankbarkeit für die Fähigkeit zu gehen.`
+            },
+            breathingExercise: {
+                title: 'Atemübungen (4-7-8)',
+                icon: '🫁',
+                description: 'Entspannungstechnik mit Zählen',
+                durations: [5, 10, 15],
+                script: `Sitze bequem. Atme vollständig aus. Schließe deine Augen. Jetzt beträgt jeder Zyklus: Einatmen für 4 Zählungen, Luft anhalten für 7 Zählungen, Ausatmen für 8 Zählungen. Beginne: Atme ein (1, 2, 3, 4). Halte an (1, 2, 3, 4, 5, 6, 7). Atme aus (1, 2, 3, 4, 5, 6, 7, 8). Wiederhole diesen Zyklus. Mit jeder Runde wird dein Nervensystem beruhigter. Diese Technik aktiviert deine natürliche Entspannungsreaktion. Verwende sie, wenn du Angst, Stress oder Schlaflosigkeit hast.`
+            },
+            hathaYoga: {
+                title: 'Hatha Yoga (Anfänger)',
+                icon: '🧘‍♀️',
+                description: 'Sanfte Dehnungen und Positionen',
+                durations: [15, 20, 30],
+                script: `1. MOUNTAIN POSE: Stehe aufrecht, Füße zusammen, Arme neben deinem Körper. Spüre deine Verbindung zur Erde.\n2. CHILD POSE: Knien, Stirn zum Boden, Arme nach vorne. Atme tief, halte 30 Sekunden.\n3. CAT-COW: Knie und Hände auf dem Boden. Wölbe den Rücken (Cow), dann runde ihn (Cat). 10 Wiederholungen.\n4. DOWNWARD DOG: Inverted V-Form, Hände und Füße am Boden. Halten Sie 5-8 Atemzüge.\n5. WARRIOR POSE: Lunge-Position, Arme nach oben. Jede Seite 30 Sekunden.\n6. TREE POSE: Ein Fuß auf den inneren Oberschenkel des anderen, Hände im Gebetssitz. Balance üben.\n7. CORPSE POSE: Flach auf dem Rücken, Arme entspannt, Augen geschlossen. 2-3 Minuten entspannen.`
+            },
+            shortPause: {
+                title: 'Pausen-Achtsamkeit',
+                icon: '⏸️',
+                description: 'Kurze Übung für Zwischendurch',
+                durations: [2, 3, 5],
+                script: `Stoppe alles. Pausiere. Wo bist du? Was machst du? Spüre deine Füße am Boden. Atme tief ein. Zähle bis 4. Halte an bis 4. Atme aus bis 4. Spüre deinen Körper. Entspanne deinen Nacken. Rollen Sie deine Schultern. Schließe deine Augen, wenn möglich. Fühle den gegenwärtigen Moment. Du brauchst nicht überall zu sein außer hier. Du brauchst nicht alles zu tun außer zu atmen. Dies ist genug. Du bist genug. Öffne deine Augen. Du bist erfrischter, klarer, gegenwärtiger.`
+            }
+        };
+
+        // App State
+        const app = {
+            currentMeditation: null,
+            selectedDuration: null,
+            isRunning: false,
+            isPaused: false,
+            timeRemaining: 0,
+            totalTime: 0,
+            timerInterval: null,
+            sessionStartTime: null,
+
+            init() {
+                this.loadHistory();
+                this.renderGallery();
+                this.setupNavigation();
+                this.registerServiceWorker();
+                console.log('Mindfulness App loaded');
+            },
+
+            renderGallery() {
+                const gallery = document.getElementById('gallery');
+                gallery.innerHTML = '';
+                
+                Object.entries(meditations).forEach(([key, med]) => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.onclick = () => this.selectMeditation(key, med);
+                    card.innerHTML = `
+                        <div class="card-icon">${med.icon}</div>
+                        <h3>${med.title}</h3>
+                        <p>${med.description}</p>
+                        <div class="card-duration">${med.durations.join(', ')} Min</div>
+                    `;
+                    gallery.appendChild(card);
+                });
+            },
+
+            selectMeditation(key, med) {
+                this.currentMeditation = { key, ...med };
+                document.getElementById('playerTitle').textContent = med.title;
+                document.getElementById('playerIcon').textContent = med.icon;
+                document.getElementById('meditationScript').textContent = med.script;
+
+                // Render time selector
+                const selector = document.getElementById('timeSelector');
+                selector.innerHTML = '';
+                med.durations.forEach(duration => {
+                    const btn = document.createElement('button');
+                    btn.className = 'time-btn';
+                    btn.textContent = `${duration} Min`;
+                    btn.onclick = () => this.selectDuration(duration);
+                    selector.appendChild(btn);
+                });
+
+                // Show meditation section
+                this.showSection('meditate');
+            },
+
+            selectDuration(minutes) {
+                this.selectedDuration = minutes;
+                document.querySelectorAll('.time-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                event.target.classList.add('selected');
+                
+                this.totalTime = minutes * 60;
+                this.timeRemaining = this.totalTime;
+                this.updateTimerDisplay();
+            },
+
+            startMeditation() {
+                if (!this.selectedDuration) {
+                    alert('Wähle eine Dauer');
+                    return;
+                }
+
+                this.isRunning = true;
+                this.isPaused = false;
+                this.sessionStartTime = Date.now() - (this.totalTime - this.timeRemaining) * 1000;
+
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('pauseBtn').disabled = false;
+
+                this.timerInterval = setInterval(() => {
+                    this.timeRemaining--;
+                    this.updateTimerDisplay();
+                    this.updateProgress();
+
+                    if (this.timeRemaining <= 0) {
+                        this.completeMeditation();
+                    }
+                }, 1000);
+            },
+
+            pauseMeditation() {
+                if (this.isRunning) {
+                    this.isRunning = false;
+                    this.isPaused = true;
+                    clearInterval(this.timerInterval);
+                    document.getElementById('pauseBtn').textContent = 'Fortsetzen';
+                    document.getElementById('pauseBtn').onclick = () => this.resumeMeditation();
+                } 
+            },
+
+            resumeMeditation() {
+                if (this.isPaused) {
+                    this.isRunning = true;
+                    this.isPaused = false;
+                    document.getElementById('pauseBtn').textContent = 'Pause';
+                    document.getElementById('pauseBtn').onclick = () => this.pauseMeditation();
+                    this.startMeditation();
+                }
+            },
+
+            resetMeditation() {
+                clearInterval(this.timerInterval);
+                this.isRunning = false;
+                this.isPaused = false;
+                this.timeRemaining = this.totalTime;
+                this.updateTimerDisplay();
+                this.updateProgress();
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('pauseBtn').disabled = true;
+                document.getElementById('pauseBtn').textContent = 'Pause';
+                document.getElementById('pauseBtn').onclick = () => this.pauseMeditation();
+            },
+
+            completeMeditation() {
+                clearInterval(this.timerInterval);
+                this.isRunning = false;
+
+                // Play bell sound
+                this.playBellSound();
+
+                // Save to history
+                const session = {
+                    type: this.currentMeditation.title,
+                    duration: this.selectedDuration,
+                    date: new Date().toISOString(),
+                    completed: true
+                };
+                this.saveSession(session);
+
+                // Notification
+                this.showNotification(`🎉 Großartig! Du hast ${this.selectedDuration} Minuten ${this.currentMeditation.title} abgeschlossen.`);
+
+                this.resetMeditation();
+            },
+
+            updateTimerDisplay() {
+                const minutes = Math.floor(this.timeRemaining / 60);
+                const seconds = this.timeRemaining % 60;
+                document.getElementById('timerDisplay').textContent = 
+                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            },
+
+            updateProgress() {
+                const progress = ((this.totalTime - this.timeRemaining) / this.totalTime) * 100;
+                document.getElementById('progressFill').style.width = progress + '%';
+            },
+
+            playBellSound() {
+                // Generate a simple bell sound using Web Audio API
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.frequency.setValueAtTime(528, ctx.currentTime); // Healing frequency
+                osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 1);
+                
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1);
+                
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 1);
+            },
+
+            saveSession(session) {
+                let history = this.getHistory();
+                history.push(session);
+                localStorage.setItem('mindfulness_history', JSON.stringify(history));
+                this.updateStats();
+                this.renderHistory();
+            },
+
+            getHistory() {
+                const stored = localStorage.getItem('mindfulness_history');
+                return stored ? JSON.parse(stored) : [];
+            },
+
+            loadHistory() {
+                this.updateStats();
+                this.renderHistory();
+            },
+
+            renderHistory() {
+                const history = this.getHistory();
+                const list = document.getElementById('historyList');
+                
+                if (history.length === 0) {
+                    list.innerHTML = '<li style="text-align: center; color: var(--text-secondary);">Keine Sitzungen noch. Fang an!</li>';
+                    return;
+                }
+
+                list.innerHTML = history.slice(-20).reverse().map(session => {
+                    const date = new Date(session.date);
+                    const dateStr = date.toLocaleDateString('de-DE', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    return `
+                        <li class="history-item">
+                            <div class="history-item-info">
+                                <h4>${session.type}</h4>
+                                <div class="history-item-meta">${dateStr}</div>
+                            </div>
+                            <div class="history-item-duration">${session.duration} min</div>
+                        </li>
+                    `;
+                }).join('');
+            },
+
+            updateStats() {
+                const history = this.getHistory();
+                
+                // Total sessions & minutes
+                const totalSessions = history.length;
+                const totalMinutes = history.reduce((sum, s) => sum + s.duration, 0);
+                
+                // This week
+                const now = new Date();
+                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                const thisWeek = history.filter(s => new Date(s.date) > weekAgo).length;
+
+                // Current streak
+                let streak = 0;
+                const sortedByDate = [...history].sort((a, b) => 
+                    new Date(b.date) - new Date(a.date)
+                );
+                
+                if (sortedByDate.length > 0) {
+                    const today = new Date();
+                    let checkDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                    
+                    for (const session of sortedByDate) {
+                        const sessionDate = new Date(session.date);
+                        const sessionDay = new Date(sessionDate.getFullYear(), sessionDate.getMonth(), sessionDate.getDate());
+                        
+                        if (sessionDay.getTime() === checkDate.getTime()) {
+                            streak++;
+                            checkDate.setDate(checkDate.getDate() - 1);
+                        } else if (sessionDay.getTime() < checkDate.getTime()) {
+                            break;
+                        }
+                    }
+                }
+
+                document.getElementById('totalSessions').textContent = totalSessions;
+                document.getElementById('totalMinutes').textContent = totalMinutes;
+                document.getElementById('thisWeek').textContent = thisWeek;
+                document.getElementById('currentStreak').textContent = streak;
+            },
+
+            clearHistory() {
+                if (confirm('Alle Sitzungen löschen? Dies kann nicht rückgängig gemacht werden.')) {
+                    localStorage.removeItem('mindfulness_history');
+                    this.updateStats();
+                    this.renderHistory();
+                    this.showNotification('📋 Verlauf gelöscht');
+                }
+            },
+
+            showSection(sectionId) {
+                document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+                document.getElementById(sectionId).classList.add('active');
+
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+            },
+
+            setupNavigation() {
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.showSection(btn.dataset.section);
+                    });
+                });
+            },
+
+            showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            },
+
+            registerServiceWorker() {
+                if ('serviceWorker' in navigator) {
+                    // Create inline service worker
+                    const swCode = `
+                        const CACHE_NAME = 'mindfulness-v1';
+                        const urlsToCache = [
+                            '/',
+                            '/index.html',
+                            '/mindfulness-app.html'
+                        ];
+
+                        self.addEventListener('install', event => {
+                            event.waitUntil(
+                                caches.open(CACHE_NAME).then(cache => {
+                                    return cache.addAll(['/mindfulness-app.html']).catch(() => {});
+                                })
+                            );
+                        });
+
+                        self.addEventListener('fetch', event => {
+                            event.respondWith(
+                                caches.match(event.request).then(response => {
+                                    return response || fetch(event.request);
+                                }).catch(() => {
+                                    return caches.match('/mindfulness-app.html');
+                                })
+                            );
+                        });
+                    `;
+
+                    const blob = new Blob([swCode], { type: 'application/javascript' });
+                    const swUrl = URL.createObjectURL(blob);
+
+                    navigator.serviceWorker.register(swUrl).catch(() => {
+                        // Service Worker registration failed, app still works offline with localStorage
+                    });
+                }
+            }
+        };
+
+        // Initialize app on load
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
