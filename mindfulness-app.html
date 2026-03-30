@@ -904,7 +904,6 @@
 
             showCountdownScreen() {
                 let countdownTime = 10;
-                let soundPlayed = false;
                 const self = this;
                 
                 const countdownScreen = document.createElement('div');
@@ -922,12 +921,6 @@
                 const countdownInterval = setInterval(() => {
                     countdownTime--;
                     
-                    // Tingsha sound at 7 seconds (transition signal)
-                    if (countdownTime === 7 && !soundPlayed) {
-                        self.playBellSound();
-                        soundPlayed = true;
-                    }
-                    
                     if (countdownTime > 0) {
                         countdownDisplay.textContent = countdownTime;
                         // Add animation for pulse effect
@@ -936,9 +929,8 @@
                             countdownDisplay.style.animation = 'countdown-pulse 0.6s ease-out';
                         }, 10);
                     } else {
-                        // Countdown finished, play bell sound and start actual meditation
+                        // Countdown finished, start actual meditation
                         clearInterval(countdownInterval);
-                        self.playBellSound(); // Ring bell at end of countdown
                         countdownScreen.style.animation = 'fadeOut 0.3s ease';
                         setTimeout(() => {
                             countdownScreen.remove();
@@ -955,6 +947,19 @@
 
                 document.getElementById('startBtn').disabled = true;
                 document.getElementById('pauseBtn').disabled = false;
+
+                // Schedule double bell at 10 seconds before end
+                const bellTime = (this.totalTime - 10) * 1000;
+                setTimeout(() => {
+                    if (this.isRunning && !this.isPaused) {
+                        this.playBellSound(); // First bell
+                        setTimeout(() => {
+                            if (this.isRunning && !this.isPaused) {
+                                this.playBellSound(); // Second bell (1 second later)
+                            }
+                        }, 1000);
+                    }
+                }, bellTime);
 
                 this.timerInterval = setInterval(() => {
                     this.timeRemaining--;
