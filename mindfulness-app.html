@@ -927,6 +927,18 @@
                     return;
                 }
 
+                // Initialize audio context (Safari requirement - must happen on user interaction)
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    if (audioContext.state === 'suspended') {
+                        audioContext.resume().then(() => {
+                            console.log('✅ Audio context resumed');
+                        });
+                    }
+                } catch (err) {
+                    console.log('Audio context error:', err);
+                }
+
                 // Show 10-second countdown screen (bell plays when meditation starts)
                 this.showCountdownScreen();
             },
@@ -1076,25 +1088,26 @@
                 try {
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     
-                    // Resume audio context if suspended (mobile requirement)
+                    // Ensure audio context is running
                     if (audioContext.state === 'suspended') {
-                        audioContext.resume();
+                        audioContext.resume().then(() => console.log('Audio context resumed'));
                     }
                     
                     const now = audioContext.currentTime;
                     const duration = 3.5; // Bell ring duration
                     
-                    // Create main output gain (master volume)
+                    // Create main output gain (master volume) - LOUD
                     const masterGain = audioContext.createGain();
-                    masterGain.gain.setValueAtTime(0.8, now);
+                    masterGain.gain.setValueAtTime(1.0, now); // Max volume
                     masterGain.connect(audioContext.destination);
                     
                     // Bell frequencies (harmonic series for bell-like tone)
                     const frequencies = [
-                        { freq: 392, gain: 0.5, decay: 3.5 },   // G4 - fundamental
-                        { freq: 784, gain: 0.3, decay: 3.0 },   // G5 - 2nd harmonic
-                        { freq: 1176, gain: 0.2, decay: 2.5 },  // G6 - 3rd harmonic
-                        { freq: 1568, gain: 0.1, decay: 2.0 }   // G7 - 4th harmonic
+                        { freq: 196, gain: 0.6, decay: 3.5 },   // G3 - sub bass
+                        { freq: 392, gain: 0.8, decay: 3.5 },   // G4 - fundamental (LOUD)
+                        { freq: 784, gain: 0.5, decay: 3.0 },   // G5 - 2nd harmonic
+                        { freq: 1176, gain: 0.3, decay: 2.5 },  // G6 - 3rd harmonic
+                        { freq: 1568, gain: 0.2, decay: 2.0 }   // G7 - 4th harmonic
                     ];
                     
                     frequencies.forEach(({ freq, gain: initGain, decay }) => {
@@ -1106,7 +1119,7 @@
                         
                         osc.type = 'sine';
                         osc.frequency.setValueAtTime(freq, now);
-                        osc.frequency.exponentialRampToValueAtTime(freq * 0.98, now + decay);
+                        osc.frequency.exponentialRampToValueAtTime(freq * 0.97, now + decay);
                         
                         gain.gain.setValueAtTime(initGain, now);
                         gain.gain.exponentialRampToValueAtTime(0.01, now + decay);
@@ -1115,7 +1128,7 @@
                         osc.stop(now + decay);
                     });
                     
-                    console.log('🔔 Bell sound playing via Web Audio');
+                    console.log('🔔 Bell sound playing via Web Audio (Safari iOS compatible)');
                 } catch (err) {
                     console.log('Web Audio error:', err);
                 }
