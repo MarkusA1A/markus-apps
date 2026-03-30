@@ -820,6 +820,8 @@
         };
 
         // App State
+        let globalAudioContext = null; // Safari requires single AudioContext
+        
         const app = {
             currentMeditation: null,
             selectedDuration: null,
@@ -835,38 +837,17 @@
                 this.renderGallery();
                 this.setupNavigation();
                 this.registerServiceWorker();
-                this.initAudioElement();
+                this.initAudioContext();
                 console.log('Mindfulness App with 10-Second Countdown loaded');
             },
 
-            initAudioElement() {
-                // Convert M4A base64 to Blob URL for Safari compatibility
+            initAudioContext() {
+                // Create global AudioContext once (Safari requirement)
                 try {
-                    const audioElement = document.getElementById('tingshaAudio');
-                    if (!audioElement) return;
-                    
-                    const src = audioElement.querySelector('source');
-                    if (!src) return;
-                    
-                    const dataUrl = src.src;
-                    if (dataUrl.startsWith('data:')) {
-                        // Extract base64 data
-                        const base64Data = dataUrl.split(',')[1];
-                        const binaryString = atob(base64Data);
-                        const bytes = new Uint8Array(binaryString.length);
-                        for (let i = 0; i < binaryString.length; i++) {
-                            bytes[i] = binaryString.charCodeAt(i);
-                        }
-                        
-                        // Create Blob URL (Safari workaround)
-                        const blob = new Blob([bytes], { type: 'audio/mp4' });
-                        const blobUrl = URL.createObjectURL(blob);
-                        src.src = blobUrl;
-                        audioElement.load();
-                        console.log('✅ Audio Blob URL created for Safari');
-                    }
+                    globalAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    console.log('✅ Global AudioContext created');
                 } catch (err) {
-                    console.log('Audio Blob URL init error:', err);
+                    console.log('AudioContext creation error:', err);
                 }
             },
 
@@ -1084,53 +1065,55 @@
             },
             
             playBellWithWebAudio() {
-                // Web Audio API - works on all devices including Safari iOS
+                // Use global AudioContext (Safari requirement)
                 try {
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    
-                    // Ensure audio context is running
-                    if (audioContext.state === 'suspended') {
-                        audioContext.resume().then(() => console.log('Audio context resumed'));
+                    if (!globalAudioContext) {
+                        globalAudioContext = new (window.AudioContext || window.webkitAudioContext)();
                     }
                     
-                    const now = audioContext.currentTime;
-                    const duration = 3.5; // Bell ring duration
+                    const ctx = globalAudioContext;
                     
-                    // Create main output gain (master volume) - LOUD
-                    const masterGain = audioContext.createGain();
-                    masterGain.gain.setValueAtTime(1.0, now); // Max volume
-                    masterGain.connect(audioContext.destination);
+                    // Resume if suspended
+                    if (ctx.state === 'suspended') {
+                        ctx.resume().then(() => console.log('AudioContext resumed'));
+                    }
                     
-                    // Bell frequencies (harmonic series for bell-like tone)
-                    const frequencies = [
-                        { freq: 196, gain: 0.6, decay: 3.5 },   // G3 - sub bass
-                        { freq: 392, gain: 0.8, decay: 3.5 },   // G4 - fundamental (LOUD)
-                        { freq: 784, gain: 0.5, decay: 3.0 },   // G5 - 2nd harmonic
-                        { freq: 1176, gain: 0.3, decay: 2.5 },  // G6 - 3rd harmonic
-                        { freq: 1568, gain: 0.2, decay: 2.0 }   // G7 - 4th harmonic
+                    const now = ctx.currentTime;
+                    const duration = 3.5;
+                    
+                    // Master gain - LOUD
+                    const master = ctx.createGain();
+                    master.gain.setValueAtTime(1.0, now);
+                    master.connect(ctx.destination);
+                    
+                    // Bell harmonics
+                    const bells = [
+                        { freq: 196, gain: 0.7, decay: 3.5 },   // G3
+                        { freq: 392, gain: 1.0, decay: 3.5 },   // G4 LOUDEST
+                        { freq: 784, gain: 0.6, decay: 3.0 },   // G5
+                        { freq: 1176, gain: 0.4, decay: 2.5 },  // G6
+                        { freq: 1568, gain: 0.2, decay: 2.0 }   // G7
                     ];
                     
-                    frequencies.forEach(({ freq, gain: initGain, decay }) => {
-                        const osc = audioContext.createOscillator();
-                        const gain = audioContext.createGain();
-                        
-                        osc.connect(gain);
-                        gain.connect(masterGain);
+                    bells.forEach(({ freq, gain, decay }) => {
+                        const osc = ctx.createOscillator();
+                        const env = ctx.createGain();
+                        osc.connect(env);
+                        env.connect(master);
                         
                         osc.type = 'sine';
                         osc.frequency.setValueAtTime(freq, now);
-                        osc.frequency.exponentialRampToValueAtTime(freq * 0.97, now + decay);
-                        
-                        gain.gain.setValueAtTime(initGain, now);
-                        gain.gain.exponentialRampToValueAtTime(0.01, now + decay);
+                        osc.frequency.exponentialRampToValueAtTime(freq * 0.96, now + decay);
+                        env.gain.setValueAtTime(gain, now);
+                        env.gain.exponentialRampToValueAtTime(0.001, now + decay);
                         
                         osc.start(now);
                         osc.stop(now + decay);
                     });
                     
-                    console.log('🔔 Bell sound playing via Web Audio (Safari iOS compatible)');
+                    console.log('🔔 BELL SOUND!');
                 } catch (err) {
-                    console.log('Web Audio error:', err);
+                    console.log('Bell error:', err);
                 }
             },
 
