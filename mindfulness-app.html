@@ -945,6 +945,9 @@
                 document.getElementById('startBtn').disabled = true;
                 document.getElementById('pauseBtn').disabled = false;
 
+                // Play bell when meditation starts
+                this.playBellSound();
+
                 // Schedule bell at 5 seconds before end
                 const bellTime = (this.totalTime - 5) * 1000;
                 setTimeout(() => {
