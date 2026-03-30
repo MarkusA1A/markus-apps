@@ -835,7 +835,39 @@
                 this.renderGallery();
                 this.setupNavigation();
                 this.registerServiceWorker();
+                this.initAudioElement();
                 console.log('Mindfulness App with 10-Second Countdown loaded');
+            },
+
+            initAudioElement() {
+                // Convert M4A base64 to Blob URL for Safari compatibility
+                try {
+                    const audioElement = document.getElementById('tingshaAudio');
+                    if (!audioElement) return;
+                    
+                    const src = audioElement.querySelector('source');
+                    if (!src) return;
+                    
+                    const dataUrl = src.src;
+                    if (dataUrl.startsWith('data:')) {
+                        // Extract base64 data
+                        const base64Data = dataUrl.split(',')[1];
+                        const binaryString = atob(base64Data);
+                        const bytes = new Uint8Array(binaryString.length);
+                        for (let i = 0; i < binaryString.length; i++) {
+                            bytes[i] = binaryString.charCodeAt(i);
+                        }
+                        
+                        // Create Blob URL (Safari workaround)
+                        const blob = new Blob([bytes], { type: 'audio/mp4' });
+                        const blobUrl = URL.createObjectURL(blob);
+                        src.src = blobUrl;
+                        audioElement.load();
+                        console.log('✅ Audio Blob URL created for Safari');
+                    }
+                } catch (err) {
+                    console.log('Audio Blob URL init error:', err);
+                }
             },
 
             renderGallery() {
@@ -1035,31 +1067,21 @@
             },
 
             playBellSound() {
-                // Play recorded meditation bell sound with mobile autoplay workaround
+                // Try native audio element first, then Web Audio API fallback
                 try {
                     const tingshaAudio = document.getElementById('tingshaAudio');
-                    if (tingshaAudio) {
-                        // Reset audio for clean playback
+                    if (tingshaAudio && tingshaAudio.readyState >= 2) {
+                        // Audio is loaded, try to play
                         tingshaAudio.currentTime = 0;
-                        tingshaAudio.volume = 1.0;
-                        tingshaAudio.muted = false;
-                        
-                        // Force unmute (mobile fix)
-                        if (tingshaAudio.paused) {
-                            const playPromise = tingshaAudio.play();
-                            if (playPromise !== undefined) {
-                                playPromise.catch(err => {
-                                    console.log('Audio play failed:', err.message);
-                                    // Try Web Audio fallback
-                                    this.playBellWithWebAudio();
-                                });
-                            }
-                        } else {
-                            tingshaAudio.pause();
-                            tingshaAudio.currentTime = 0;
-                            tingshaAudio.play().catch(() => this.playBellWithWebAudio());
+                        const playPromise = tingshaAudio.play();
+                        if (playPromise) {
+                            playPromise.catch(err => {
+                                console.log('Native audio failed, using Web Audio:', err.message);
+                                this.playBellWithWebAudio();
+                            });
                         }
                     } else {
+                        // Fallback immediately
                         this.playBellWithWebAudio();
                     }
                 } catch (err) {
