@@ -3,14 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="HAWIE-R basierter IQ-Test - Intelligenztest für iPhone & iPad">
-    <meta name="theme-color" content="#6366f1">
+    <meta name="description" content="HAWIE-R basierter IQ-Test">
     <title>HAWIE-R IQ-Test</title>
     
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22HAWIE-R%20IQ-Test%22%2C%22short_name%22%3A%22IQ-Test%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%236366f1%22%7D">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%236366f1' width='180' height='180'/%3E%3Ctext x='50%25' y='50%25' font-size='80' fill='white' text-anchor='middle' dominant-baseline='central'%3E🧠%3C/text%3E%3C/svg%3E">
-
     <style>
         * {
             margin: 0;
@@ -20,50 +15,21 @@
 
         :root {
             --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #10b981;
-            --danger: #ef4444;
             --bg: #f9fafb;
-            --card-bg: #ffffff;
             --text: #1f2937;
-            --text-secondary: #6b7280;
-            --border: #e5e7eb;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #111827;
-                --card-bg: #1f2937;
-                --text: #f3f4f6;
-                --text-secondary: #d1d5db;
-                --border: #374151;
-            }
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
-            line-height: 1.6;
-            transition: background 0.3s;
         }
 
         header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
             color: white;
             padding: 2rem 1.5rem;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
-        }
-
-        header h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        header p {
-            opacity: 0.9;
-            font-size: 0.95rem;
         }
 
         main {
@@ -72,66 +38,71 @@
             padding: 2rem 1.5rem;
         }
 
-        section {
-            display: none !important;
-        }
-
-        section.active {
-            display: block !important;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .card {
-            background: var(--card-bg);
+            background: white;
             border-radius: 12px;
             padding: 2rem;
             margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .test-card {
+        .hidden {
+            display: none !important;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
+            background: var(--primary);
+            color: white;
         }
 
-        .test-card:hover {
+        .btn:hover {
+            background: #4f46e5;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .option {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .option:hover {
             border-color: var(--primary);
-            transform: translateY(-2px);
+            background: #f0f4ff;
         }
 
-        .test-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--primary);
+        .option.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
-        .test-desc {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+        .progress {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
         }
 
-        .question {
-            margin-bottom: 2rem;
-        }
-
-        .question-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--text);
-        }
-
-        .question-number {
-            color: var(--primary);
-            font-weight: bold;
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s;
         }
 
         .timer {
@@ -144,584 +115,250 @@
             margin-bottom: 1rem;
         }
 
-        .timer.warning {
-            background: #f59e0b;
-        }
-
-        .timer.danger {
-            background: var(--danger);
-        }
-
-        .options {
-            display: grid;
-            gap: 0.75rem;
-        }
-
-        .option {
-            padding: 1rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: var(--card-bg);
-        }
-
-        .option:hover {
-            border-color: var(--primary);
-            background: var(--bg);
-        }
-
-        .option.selected {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .option.correct {
-            background: var(--secondary);
-            color: white;
-            border-color: var(--secondary);
-        }
-
-        .option.incorrect {
-            background: var(--danger);
-            color: white;
-            border-color: var(--danger);
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--border);
-            border-radius: 4px;
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-            transition: width 0.3s;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        .btn-primary:disabled {
-            background: var(--text-secondary);
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-
-        .btn-secondary:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
         .results {
             text-align: center;
-            padding: 2rem;
         }
 
         .iq-score {
             font-size: 3.5rem;
-            font-weight: bold;
             color: var(--primary);
+            font-weight: bold;
             margin: 1rem 0;
         }
 
-        .iq-category {
-            font-size: 1.3rem;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        .iq-interpretation {
-            background: var(--bg);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 1.5rem 0;
-            text-align: left;
-        }
-
-        .scores-breakdown {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .score-item {
-            background: var(--bg);
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .score-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .score-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        footer {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 2rem;
-        }
-
-        footer a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        .info-text {
-            background: #eff6ff;
-            border-left: 4px solid var(--primary);
-            padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
-            font-size: 0.95rem;
-        }
-
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.5rem;
-            }
-
-            main {
-                padding: 1.5rem 1rem;
-            }
-
-            .card {
-                padding: 1.5rem;
-            }
-
-            .iq-score {
-                font-size: 2.5rem;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-            }
+            .card { padding: 1.5rem; }
+            .iq-score { font-size: 2.5rem; }
         }
     </style>
 </head>
 <body>
     <header>
         <h1>🧠 HAWIE-R IQ-Test</h1>
-        <p>Intelligenztest basierend auf dem Hamburg-Wechsler-Intelligenztest</p>
+        <p>Intelligenztest basierend auf dem Hamburg-Wechsler-Test</p>
     </header>
 
     <main>
-        <!-- Start Section -->
-        <section id="start" class="active">
+        <!-- START SECTION -->
+        <div id="startSection" class="card">
+            <h2>Willkommen!</h2>
+            <p style="margin: 1rem 0; line-height: 1.6;">
+                Dieser Test basiert auf dem <strong>HAWIE-R</strong> und dauert ca. 20-30 Minuten.
+                Er besteht aus 7 Untertests zu verschiedenen kognitiven Fähigkeiten.
+            </p>
+            <p style="margin: 1rem 0; font-size: 0.9rem; color: #999;">
+                ⚠️ Nicht validiert - nur zu Unterhaltungszwecken
+            </p>
+            <button class="btn" onclick="startTest()">Test Starten</button>
+        </div>
+
+        <!-- TEST SECTION -->
+        <div id="testSection" class="hidden">
+            <div class="progress">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
             <div class="card">
-                <h2 style="margin-bottom: 1rem;">Willkommen zum IQ-Test</h2>
-                <div class="info-text">
-                    Dieser Test basiert auf dem <strong>HAWIE-R</strong> (Hamburg-Wechsler-Intelligenztest für Erwachsene, Revision). 
-                    Er dauert etwa 20-30 Minuten und besteht aus 7 Untertests.
-                </div>
-
-                <h3 style="margin: 1.5rem 0 1rem;">Untertests:</h3>
-                <ul style="margin-left: 2rem; margin-bottom: 1rem;">
-                    <li><strong>Allgemeines Wissen</strong> - Faktenwissen und Bildung</li>
-                    <li><strong>Zahlenspanne</strong> - Arbeitsgedächtnis</li>
-                    <li><strong>Wortschatz</strong> - Sprachverständnis</li>
-                    <li><strong>Rechenaufgaben</strong> - Numerische Fähigkeiten</li>
-                    <li><strong>Bilderergänzung</strong> - Wahrnehmung und Aufmerksamkeit</li>
-                    <li><strong>Blockdesign</strong> - Räumliches Denken</li>
-                    <li><strong>Symbolsuche</strong> - Verarbeitungsgeschwindigkeit</li>
-                </ul>
-
-                <div class="info-text">
-                    ⚠️ Dieser Test ist nicht validiert und dient nur zu Unterhaltungszwecken. 
-                    Für eine genaue IQ-Bestimmung konsultiere einen Psychologen.
-                </div>
-
-                <div style="margin-top: 2rem;">
-                    <button class="btn btn-primary" onclick="app.startTest()" style="width: 100%; padding: 1rem;">Test Starten</button>
+                <div class="timer" id="timer">⏱️ 60s</div>
+                <h3 id="subtestName">Allgemeines Wissen</h3>
+                <p id="questionNum">Frage 1 von 5</p>
+                <h4 id="questionText" style="margin: 1.5rem 0; font-size: 1.1rem;"></h4>
+                <div id="optionsContainer"></div>
+                <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button class="btn" onclick="prevQuestion()">← Zurück</button>
+                    <button class="btn" onclick="nextQuestion()" id="nextBtn" disabled>Weiter →</button>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Test Section -->
-        <section id="test">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-
-            <div class="card">
-                <div id="testContent"></div>
-                <div class="button-group">
-                    <button class="btn btn-secondary" id="prevBtn" onclick="app.previousQuestion()">← Zurück</button>
-                    <button class="btn btn-primary" id="nextBtn" onclick="app.nextQuestion()">Weiter →</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Results Section -->
-        <section id="results">
+        <!-- RESULTS SECTION -->
+        <div id="resultsSection" class="hidden">
             <div class="card results">
                 <h2>Dein IQ-Score</h2>
                 <div class="iq-score" id="finalScore">100</div>
-                <div class="iq-category" id="categoryText">Durchschnitt</div>
-
-                <div class="iq-interpretation">
-                    <strong>Interpretation:</strong>
-                    <p id="interpretationText" style="margin-top: 0.5rem;"></p>
-                </div>
-
-                <h3>Deine Ergebnisse:</h3>
-                <div class="scores-breakdown" id="scoresBreakdown"></div>
-
-                <div style="margin-top: 2rem;">
-                    <button class="btn btn-primary" onclick="app.restart()">Neuer Test</button>
-                </div>
+                <p id="categoryText" style="font-size: 1.2rem; margin: 1rem 0;">Durchschnitt</p>
+                <p id="interpretationText" style="margin: 1rem 0;"></p>
+                <button class="btn" onclick="location.reload()">Neuer Test</button>
             </div>
-        </section>
+        </div>
     </main>
 
-    <footer>
-        <p>© 2026 <a href="mailto:mthalhamer@thalhamer.com">Markus O. Thalhamer</a> | HAWIE-R basierter Test | <a href="https://en.wikipedia.org/wiki/Wechsler_Adult_Intelligence_Scale" target="_blank">Mehr über WAIS/HAWIE</a></p>
-    </footer>
-
     <script>
-        // Test Structure (HAWIE-R inspired)
-        const testStructure = [
+        // TEST DATEN
+        const tests = [
             {
                 name: 'Allgemeines Wissen',
-                description: 'Beantworte Fragen zu allgemeinen Fakten',
                 timeLimit: 60,
                 questions: [
-                    { q: 'Wie viele Kontinente gibt es?', options: ['5', '6', '7', '8'], correct: 2, category: 'knowledge' },
-                    { q: 'Was ist die Hauptstadt von Australien?', options: ['Sydney', 'Melbourne', 'Canberra', 'Brisbane'], correct: 2, category: 'knowledge' },
-                    { q: 'Welcher Planet ist der größte in unserem Sonnensystem?', options: ['Saturn', 'Jupiter', 'Neptune', 'Uranus'], correct: 1, category: 'knowledge' },
-                    { q: 'In welchem Jahr fiel die Berliner Mauer?', options: ['1987', '1988', '1989', '1990'], correct: 2, category: 'knowledge' },
-                    { q: 'Wer schrieb "Faust"?', options: ['Schiller', 'Goethe', 'Lessing', 'Kleist'], correct: 1, category: 'knowledge' },
+                    { q: 'Wie viele Kontinente gibt es?', a: ['5', '6', '7', '8'], c: 2 },
+                    { q: 'Was ist die Hauptstadt von Australien?', a: ['Sydney', 'Melbourne', 'Canberra', 'Brisbane'], c: 2 },
+                    { q: 'Welcher Planet ist am größten?', a: ['Saturn', 'Jupiter', 'Neptune', 'Uranus'], c: 1 },
+                    { q: 'In welchem Jahr fiel die Berliner Mauer?', a: ['1987', '1988', '1989', '1990'], c: 2 },
+                    { q: 'Wer schrieb "Faust"?', a: ['Schiller', 'Goethe', 'Lessing', 'Kleist'], c: 1 }
                 ]
             },
             {
                 name: 'Zahlenspanne',
-                description: 'Merke dir die Zahlenfolgen und gib sie wieder',
                 timeLimit: 45,
                 questions: [
-                    { q: 'Zahlenfolge: 3-7-2. Gib die Zahlen in gleicher Reihenfolge ein.', options: ['2-3-7', '3-7-2', '7-2-3', '7-3-2'], correct: 1, category: 'memory' },
-                    { q: 'Zahlenfolge: 5-1-8-4. Gib die Zahlen in gleicher Reihenfolge ein.', options: ['1-4-5-8', '5-1-8-4', '4-8-1-5', '8-4-5-1'], correct: 1, category: 'memory' },
-                    { q: 'Zahlenfolge: 2-6-9-5-1. Gib die Zahlen in gleicher Reihenfolge ein.', options: ['1-2-5-6-9', '2-6-9-5-1', '5-1-2-6-9', '9-6-5-2-1'], correct: 1, category: 'memory' },
-                    { q: 'Zahlenfolge: 7-3-8-1-4-6. Gib die Zahlen in gleicher Reihenfolge ein.', options: ['1-3-4-6-7-8', '7-3-8-1-4-6', '6-4-1-8-3-7', '8-7-6-4-3-1'], correct: 1, category: 'memory' },
-                    { q: 'Zahlenfolge: 9-2-5-8-1-6-3. Gib die Zahlen in gleicher Reihenfolge ein.', options: ['1-2-3-5-6-8-9', '9-2-5-8-1-6-3', '3-6-1-8-5-2-9', '9-8-6-5-3-2-1'], correct: 1, category: 'memory' },
+                    { q: 'Zahlenfolge: 3-7-2', a: ['2-3-7', '3-7-2', '7-2-3', '7-3-2'], c: 1 },
+                    { q: 'Zahlenfolge: 5-1-8-4', a: ['1-4-5-8', '5-1-8-4', '4-8-1-5', '8-4-5-1'], c: 1 },
+                    { q: 'Zahlenfolge: 2-6-9-5-1', a: ['1-2-5-6-9', '2-6-9-5-1', '5-1-2-6-9', '9-6-5-2-1'], c: 1 },
+                    { q: 'Zahlenfolge: 7-3-8-1-4-6', a: ['1-3-4-6-7-8', '7-3-8-1-4-6', '6-4-1-8-3-7', '8-7-6-4-3-1'], c: 1 },
+                    { q: 'Zahlenfolge: 9-2-5-8-1-6-3', a: ['1-2-3-5-6-8-9', '9-2-5-8-1-6-3', '3-6-1-8-5-2-9', '9-8-6-5-3-2-1'], c: 1 }
                 ]
             },
             {
                 name: 'Wortschatz',
-                description: 'Erkläre die Bedeutung dieser Wörter',
                 timeLimit: 60,
                 questions: [
-                    { q: 'Was bedeutet "Nostalgie"?', options: ['Lautstärke', 'Sehnsucht nach Vergangenem', 'Angststörung', 'Schlaflosigkeit'], correct: 1, category: 'vocab' },
-                    { q: 'Was bedeutet "ephemär"?', options: ['Dauerhaft', 'Flüchtig, kurzlebig', 'Hoch oben', 'Geheim'], correct: 1, category: 'vocab' },
-                    { q: 'Was bedeutet "Ambivalenz"?', options: ['Doppelte Nationalität', 'Widersprüchliche Gefühle', 'Mangel an Mut', 'Überraschung'], correct: 1, category: 'vocab' },
-                    { q: 'Was bedeutet "obsolet"?', options: ['Offenbar', 'Veraltet, überholt', 'Geheimnissvoll', 'Wertvoll'], correct: 1, category: 'vocab' },
-                    { q: 'Was bedeutet "Kontemplation"?', options: ['Debatte', 'Tiefes Nachdenken', 'Handlung', 'Bewegung'], correct: 1, category: 'vocab' },
+                    { q: 'Was bedeutet "Nostalgie"?', a: ['Lautstärke', 'Sehnsucht nach Vergangenem', 'Angststörung', 'Schlaflosigkeit'], c: 1 },
+                    { q: 'Was bedeutet "ephemär"?', a: ['Dauerhaft', 'Flüchtig, kurzlebig', 'Hoch oben', 'Geheim'], c: 1 },
+                    { q: 'Was bedeutet "Ambivalenz"?', a: ['Doppelte Nationalität', 'Widersprüchliche Gefühle', 'Mangel an Mut', 'Überraschung'], c: 1 },
+                    { q: 'Was bedeutet "obsolet"?', a: ['Offenbar', 'Veraltet, überholt', 'Geheimnissvoll', 'Wertvoll'], c: 1 },
+                    { q: 'Was bedeutet "Kontemplation"?', a: ['Debatte', 'Tiefes Nachdenken', 'Handlung', 'Bewegung'], c: 1 }
                 ]
             },
             {
                 name: 'Rechenaufgaben',
-                description: 'Löse die mathematischen Aufgaben',
                 timeLimit: 90,
                 questions: [
-                    { q: 'Ein Buch kostet 15€, du zahlst mit 50€. Wieviel Wechselgeld bekommst du?', options: ['30€', '35€', '45€', '25€'], correct: 1, category: 'math' },
-                    { q: 'Wenn 3 Arbeiter 6 Stunden brauchen, um einen Zaun zu bauen, wie lange braucht 1 Arbeiter?', options: ['2h', '9h', '12h', '18h'], correct: 3, category: 'math' },
-                    { q: 'Was ist 25% von 120?', options: ['20', '25', '30', '40'], correct: 2, category: 'math' },
-                    { q: 'Ein Zug fährt mit 100 km/h. Wie weit kommt er in 2,5 Stunden?', options: ['200km', '250km', '300km', '350km'], correct: 1, category: 'math' },
-                    { q: 'Wenn x + 15 = 42, was ist x?', options: ['25', '27', '29', '31'], correct: 1, category: 'math' },
+                    { q: 'Ein Buch kostet 15€, du zahlst 50€. Wieviel Wechselgeld?', a: ['30€', '35€', '45€', '25€'], c: 1 },
+                    { q: '3 Arbeiter brauchen 6h. 1 Arbeiter braucht wie lange?', a: ['2h', '9h', '12h', '18h'], c: 3 },
+                    { q: 'Was ist 25% von 120?', a: ['20', '25', '30', '40'], c: 2 },
+                    { q: 'Zug fährt 100 km/h für 2,5h. Wie weit?', a: ['200km', '250km', '300km', '350km'], c: 1 },
+                    { q: 'Wenn x + 15 = 42, was ist x?', a: ['25', '27', '29', '31'], c: 1 }
                 ]
             },
             {
                 name: 'Bilderergänzung',
-                description: 'Wähle das fehlende Element',
                 timeLimit: 45,
                 questions: [
-                    { q: 'Was fehlt diesem Auto?', options: ['Räder', 'Fenster', 'Tür', 'Lenkrad'], correct: 0, category: 'visual' },
-                    { q: 'Was fehlt dieser Uhr?', options: ['Zeiger', 'Ziffern', 'Gehäuse', 'Batterie'], correct: 0, category: 'visual' },
-                    { q: 'Was fehlt dieser Hand?', options: ['Daumen', 'Finger', 'Handfläche', 'Gelenk'], correct: 0, category: 'visual' },
-                    { q: 'Was fehlt dieser Treppe?', options: ['Stufe', 'Geländer', 'Schatten', 'Winkel'], correct: 0, category: 'visual' },
-                    { q: 'Was fehlt diesem Haus?', options: ['Tür', 'Fenster', 'Dach', 'Rauch'], correct: 0, category: 'visual' },
+                    { q: 'Was fehlt diesem Auto?', a: ['Räder', 'Fenster', 'Tür', 'Lenkrad'], c: 0 },
+                    { q: 'Was fehlt dieser Uhr?', a: ['Zeiger', 'Ziffern', 'Gehäuse', 'Batterie'], c: 0 },
+                    { q: 'Was fehlt dieser Hand?', a: ['Daumen', 'Finger', 'Handfläche', 'Gelenk'], c: 0 },
+                    { q: 'Was fehlt dieser Treppe?', a: ['Stufe', 'Geländer', 'Schatten', 'Winkel'], c: 0 },
+                    { q: 'Was fehlt diesem Haus?', a: ['Tür', 'Fenster', 'Dach', 'Rauch'], c: 0 }
                 ]
             },
             {
                 name: 'Blockdesign',
-                description: 'Erkenne die räumlichen Muster',
                 timeLimit: 60,
                 questions: [
-                    { q: 'Wie viele Würfel brauchst du, um dieses 3x3x3 Gitter zu füllen?', options: ['18', '24', '27', '30'], correct: 2, category: 'spatial' },
-                    { q: 'Wenn du einen Würfel so faltest: welche Fläche sitzt gegenüber von der roten?', options: ['Blau', 'Gelb', 'Grün', 'Weiß'], correct: 1, category: 'spatial' },
-                    { q: 'Wie viele Kantenlinien hat ein Würfel?', options: ['8', '10', '12', '14'], correct: 2, category: 'spatial' },
-                    { q: 'Wie viele unterschiedliche Ebenen hat ein Schachbrett?', options: ['1', '2', '3', '8'], correct: 0, category: 'spatial' },
-                    { q: 'Rotiere dieses L um 90 Grad. Wie sieht es aus?', options: ['⌐', '⌞', '⌟', '⌜'], correct: 2, category: 'spatial' },
+                    { q: 'Wie viele Würfel für ein 3x3x3 Gitter?', a: ['18', '24', '27', '30'], c: 2 },
+                    { q: 'Welche Fläche sitzt gegenüber von rot?', a: ['Blau', 'Gelb', 'Grün', 'Weiß'], c: 1 },
+                    { q: 'Wie viele Kanten hat ein Würfel?', a: ['8', '10', '12', '14'], c: 2 },
+                    { q: 'Wie viele Ebenen hat ein Schachbrett?', a: ['1', '2', '3', '8'], c: 0 },
+                    { q: 'Rotiere L um 90°. Wie sieht es aus?', a: ['⌐', '⌞', '⌟', '⌜'], c: 2 }
                 ]
             },
             {
                 name: 'Symbolsuche',
-                description: 'Finde die Symbole in der Liste',
                 timeLimit: 30,
                 questions: [
-                    { q: 'Finde © in dieser Liste: ® © ™ ◆ ◇ ■ □', options: ['Position 2', 'Position 3', 'Position 4', 'Position 5'], correct: 0, category: 'speed' },
-                    { q: 'Finde ★ in: ☆ ★ ✪ ✯ ✦ ✧ ✓', options: ['Position 1', 'Position 2', 'Position 3', 'Position 4'], correct: 1, category: 'speed' },
-                    { q: 'Finde ◆ in: ◇ □ ◆ ▪ ▫ ◎ ◉', options: ['Position 1', 'Position 2', 'Position 3', 'Position 4'], correct: 2, category: 'speed' },
-                    { q: 'Finde ▲ in: ▼ ◆ ▲ ✕ ✗ ✔ ✓', options: ['Position 1', 'Position 2', 'Position 3', 'Position 4'], correct: 2, category: 'speed' },
-                    { q: 'Finde § in: ¶ ¢ £ § ¤ ¥ €', options: ['Position 1', 'Position 2', 'Position 3', 'Position 4'], correct: 3, category: 'speed' },
+                    { q: 'Finde © in: ® © ™ ◆', a: ['Pos 1', 'Pos 2', 'Pos 3', 'Pos 4'], c: 1 },
+                    { q: 'Finde ★ in: ☆ ★ ✪ ✯', a: ['Pos 1', 'Pos 2', 'Pos 3', 'Pos 4'], c: 1 },
+                    { q: 'Finde ◆ in: ◇ □ ◆ ▪', a: ['Pos 1', 'Pos 2', 'Pos 3', 'Pos 4'], c: 2 },
+                    { q: 'Finde ▲ in: ▼ ◆ ▲ ✕', a: ['Pos 1', 'Pos 2', 'Pos 3', 'Pos 4'], c: 2 },
+                    { q: 'Finde § in: ¶ ¢ £ §', a: ['Pos 1', 'Pos 2', 'Pos 3', 'Pos 4'], c: 3 }
                 ]
             }
         ];
 
-        const app = {
-            currentSubtest: 0,
-            currentQuestion: 0,
-            answers: {},
-            scores: {},
-            timeStarted: null,
+        let currentTestIdx = 0;
+        let currentQ = 0;
+        let answers = {};
+        let scores = {};
 
-            init() {
-                window.addEventListener('load', () => {
-                    console.log('HAWIE-R IQ Test loaded');
-                });
-            },
+        function startTest() {
+            console.log('START TEST');
+            document.getElementById('startSection').classList.add('hidden');
+            document.getElementById('testSection').classList.remove('hidden');
+            showQuestion();
+        }
 
-            startTest() {
-                console.log('✅ Test started');
-                this.currentSubtest = 0;
-                this.currentQuestion = 0;
-                this.answers = {};
-                this.scores = {};
-                this.showTest();
-            },
+        function showQuestion() {
+            const test = tests[currentTestIdx];
+            const q = test.questions[currentQ];
+            const total = tests.reduce((s, t) => s + t.questions.length, 0);
+            const done = Object.keys(answers).length;
+            
+            document.getElementById('subtestName').textContent = test.name;
+            document.getElementById('questionNum').textContent = `Frage ${currentQ + 1} von ${test.questions.length}`;
+            document.getElementById('questionText').textContent = q.q;
+            document.getElementById('progressBar').style.width = (done / total * 100) + '%';
+            
+            let html = '';
+            q.a.forEach((opt, i) => {
+                const key = currentTestIdx + '-' + currentQ;
+                const selected = answers[key] === i ? 'selected' : '';
+                html += `<div class="option ${selected}" onclick="selectOption(${i})">${opt}</div>`;
+            });
+            document.getElementById('optionsContainer').innerHTML = html;
+            
+            document.getElementById('nextBtn').disabled = !answers[currentTestIdx + '-' + currentQ];
+        }
 
-            showTest() {
-                const subtest = testStructure[this.currentSubtest];
-                const question = subtest.questions[this.currentQuestion];
-                const totalQuestions = subtest.questions.length;
-                
-                let html = `
-                    <div>
-                        <h2 style="margin-bottom: 0.5rem;">${subtest.name}</h2>
-                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Frage ${this.currentQuestion + 1} von ${totalQuestions}</p>
-                        <div class="timer" id="timer">⏱️ ${subtest.timeLimit}s</div>
-                        <div class="question">
-                            <div class="question-text"><span class="question-number">${this.currentQuestion + 1}.</span> ${question.q}</div>
-                            <div class="options">
-                `;
+        function selectOption(idx) {
+            const key = currentTestIdx + '-' + currentQ;
+            answers[key] = idx;
+            showQuestion();
+        }
 
-                question.options.forEach((opt, idx) => {
-                    const key = `${this.currentSubtest}-${this.currentQuestion}`;
-                    const selected = this.answers[key] === idx ? ' selected' : '';
-                    html += `<div class="option${selected}" onclick="app.selectAnswer(${idx})">${opt}</div>`;
-                });
-
-                html += `</div></div>`;
-                document.getElementById('testContent').innerHTML = html;
-
-                // Update progress
-                const totalQuestions = testStructure.reduce((sum, s) => sum + s.questions.length, 0);
-                const answered = Object.keys(this.answers).length;
-                const progress = (answered / totalQuestions) * 100;
-                document.getElementById('progressFill').style.width = progress + '%';
-
-                // Update button states
-                document.getElementById('prevBtn').disabled = this.currentSubtest === 0 && this.currentQuestion === 0;
-                document.getElementById('nextBtn').disabled = !this.canProceed();
-
-                // Show/hide sections
-                document.getElementById('start').classList.remove('active');
-                document.getElementById('test').classList.add('active');
-                document.getElementById('results').classList.remove('active');
-
-                // Timer
-                this.startTimer(subtest.timeLimit);
-            },
-
-            selectAnswer(idx) {
-                const key = `${this.currentSubtest}-${this.currentQuestion}`;
-                this.answers[key] = idx;
-                document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-                if (event && event.target) {
-                    event.target.classList.add('selected');
-                }
-                const nextBtn = document.getElementById('nextBtn');
-                if (nextBtn) nextBtn.disabled = false;
-            },
-
-            canProceed() {
-                const key = `${this.currentSubtest}-${this.currentQuestion}`;
-                return this.answers[key] !== undefined;
-            },
-
-            nextQuestion() {
-                const subtest = testStructure[this.currentSubtest];
-                
-                if (this.currentQuestion < subtest.questions.length - 1) {
-                    this.currentQuestion++;
-                } else if (this.currentSubtest < testStructure.length - 1) {
-                    this.currentSubtest++;
-                    this.currentQuestion = 0;
-                } else {
-                    this.finishTest();
-                    return;
-                }
-
-                this.showTest();
-            },
-
-            previousQuestion() {
-                if (this.currentQuestion > 0) {
-                    this.currentQuestion--;
-                } else if (this.currentSubtest > 0) {
-                    this.currentSubtest--;
-                    this.currentQuestion = testStructure[this.currentSubtest].questions.length - 1;
-                }
-                this.showTest();
-            },
-
-            startTimer(seconds) {
-                clearInterval(this.timerInterval);
-                let remaining = seconds;
-                const timerEl = document.getElementById('timer');
-
-                this.timerInterval = setInterval(() => {
-                    remaining--;
-                    if (timerEl) {
-                        timerEl.textContent = `⏱️ ${remaining}s`;
-                        if (remaining <= 10) timerEl.className = 'timer danger';
-                        else if (remaining <= 20) timerEl.className = 'timer warning';
-                    }
-                    if (remaining <= 0) {
-                        this.nextQuestion();
-                    }
-                }, 1000);
-            },
-
-            finishTest() {
-                clearInterval(this.timerInterval);
-                this.calculateScores();
-                this.showResults();
-            },
-
-            calculateScores() {
-                // Zähle korrekte Antworten pro Subtest
-                testStructure.forEach((subtest, stIdx) => {
-                    let correct = 0;
-                    subtest.questions.forEach((q, qIdx) => {
-                        const key = `${stIdx}-${qIdx}`;
-                        if (this.answers[key] === q.correct) {
-                            correct++;
-                        }
-                    });
-                    const score = Math.round((correct / subtest.questions.length) * 100);
-                    this.scores[subtest.name] = score;
-                });
-
-                // Calculate overall IQ
-                const avgScore = Object.values(this.scores).reduce((a, b) => a + b, 0) / Object.keys(this.scores).length;
-                this.iqScore = Math.round(70 + (avgScore / 100) * 60); // 70-130 range
-                this.iqScore = Math.max(70, Math.min(130, this.iqScore)); // Clamp between 70-130
-            },
-
-            showResults() {
-                document.getElementById('start').classList.remove('active');
-                document.getElementById('test').classList.remove('active');
-                document.getElementById('results').classList.add('active');
-
-                document.getElementById('finalScore').textContent = this.iqScore;
-
-                // Category
-                let category = '';
-                let interpretation = '';
-                if (this.iqScore >= 130) {
-                    category = 'Sehr Hoch';
-                    interpretation = 'Sie haben außergewöhnliche intellektuelle Fähigkeiten. Kreativität und schnelle Problemlösung sind Ihre Stärken.';
-                } else if (this.iqScore >= 120) {
-                    category = 'Weit Überdurchschnitt';
-                    interpretation = 'Sie zeigen herausragende intellektuelle Fähigkeiten in vielen Bereichen.';
-                } else if (this.iqScore >= 110) {
-                    category = 'Überdurchschnitt';
-                    interpretation = 'Sie haben gute analytische und verbale Fähigkeiten.';
-                } else if (this.iqScore >= 90) {
-                    category = 'Durchschnitt';
-                    interpretation = 'Sie zeigen normale intellektuelle Fähigkeiten über dem Durchschnitt.';
-                } else if (this.iqScore >= 80) {
-                    category = 'Unterdurchschnitt';
-                    interpretation = 'Sie haben solide grundlegende Fähigkeiten.';
-                } else {
-                    category = 'Sehr Niedrig';
-                    interpretation = 'Konzentration auf Stärkenentwicklung wird empfohlen.';
-                }
-
-                document.getElementById('categoryText').textContent = category;
-                document.getElementById('interpretationText').textContent = interpretation;
-
-                // Scores breakdown
-                let breakdown = '';
-                Object.entries(this.scores).forEach(([name, score]) => {
-                    breakdown += `
-                        <div class="score-item">
-                            <div class="score-label">${name}</div>
-                            <div class="score-value">${score}%</div>
-                        </div>
-                    `;
-                });
-                document.getElementById('scoresBreakdown').innerHTML = breakdown;
-            },
-
-            restart() {
-                location.reload();
+        function nextQuestion() {
+            const test = tests[currentTestIdx];
+            if (currentQ < test.questions.length - 1) {
+                currentQ++;
+                showQuestion();
+            } else if (currentTestIdx < tests.length - 1) {
+                currentTestIdx++;
+                currentQ = 0;
+                showQuestion();
+            } else {
+                finishTest();
             }
-        };
+        }
 
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', () => {
-            app.init();
-        });
+        function prevQuestion() {
+            if (currentQ > 0) {
+                currentQ--;
+            } else if (currentTestIdx > 0) {
+                currentTestIdx--;
+                currentQ = tests[currentTestIdx].questions.length - 1;
+            }
+            showQuestion();
+        }
+
+        function finishTest() {
+            // Calculate scores
+            tests.forEach((test, tIdx) => {
+                let correct = 0;
+                test.questions.forEach((q, qIdx) => {
+                    if (answers[tIdx + '-' + qIdx] === q.c) {
+                        correct++;
+                    }
+                });
+                scores[test.name] = Math.round(correct / test.questions.length * 100);
+            });
+
+            const avg = Object.values(scores).reduce((a, b) => a + b, 0) / Object.keys(scores).length;
+            const iq = Math.round(70 + (avg / 100) * 60);
+
+            document.getElementById('startSection').classList.add('hidden');
+            document.getElementById('testSection').classList.add('hidden');
+            document.getElementById('resultsSection').classList.remove('hidden');
+            document.getElementById('finalScore').textContent = iq;
+
+            let category = 'Durchschnitt';
+            let interpretation = 'Sie zeigen normale intellektuelle Fähigkeiten.';
+            if (iq >= 130) { category = 'Sehr Hoch'; interpretation = 'Außergewöhnliche intellektuelle Fähigkeiten!'; }
+            else if (iq >= 120) { category = 'Weit Überdurchschnitt'; interpretation = 'Herausragende Fähigkeiten in vielen Bereichen.'; }
+            else if (iq >= 110) { category = 'Überdurchschnitt'; interpretation = 'Gute analytische Fähigkeiten.'; }
+            else if (iq >= 90) { category = 'Durchschnitt'; interpretation = 'Normale intellektuelle Fähigkeiten.'; }
+            else if (iq >= 80) { category = 'Unterdurchschnitt'; interpretation = 'Solide grundlegende Fähigkeiten.'; }
+
+            document.getElementById('categoryText').textContent = category;
+            document.getElementById('interpretationText').textContent = interpretation;
+        }
     </script>
 </body>
 </html>
