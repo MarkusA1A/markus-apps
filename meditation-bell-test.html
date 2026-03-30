@@ -70,7 +70,7 @@
         
         <div class="info">
             <p><strong>Beschreibung:</strong></p>
-            <p>🏔️ Tibetan Singing Bowl — warm, resonant, mit natürlichen Obertönen. Lange, beruhigende Sustain.</p>
+            <p>🥉 Tibetische Zimbeln — hell, metallisch, mit Shimmer & Chime. Schneller Attack, schimmernder Ausklang.</p>
             <p style="font-size: 12px; margin-top: 20px; color: #999;">
                 Wenn dir der Ton gefällt → bestätige in Telegram<br>
                 Wenn nicht → sag mir eine Alternative!
@@ -83,62 +83,93 @@
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const now = audioContext.currentTime;
             
-            // Create multiple oscillators for Tibetan Singing Bowl effect
+            // Create multiple oscillators for Tibetan Cymbals effect (bright, metallic)
             const osc1 = audioContext.createOscillator();
             const osc2 = audioContext.createOscillator();
             const osc3 = audioContext.createOscillator();
+            const osc4 = audioContext.createOscillator();
             const gain1 = audioContext.createGain();
             const gain2 = audioContext.createGain();
             const gain3 = audioContext.createGain();
+            const gain4 = audioContext.createGain();
             const masterGain = audioContext.createGain();
             
-            // Connect oscillators to gains to master
+            // Create noise for metallic shimmer
+            const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 2, audioContext.sampleRate);
+            const noiseData = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < noiseBuffer.length; i++) {
+                noiseData[i] = Math.random() * 2 - 1;
+            }
+            const noiseSource = audioContext.createBufferSource();
+            noiseSource.buffer = noiseBuffer;
+            noiseSource.loop = true;
+            const noiseGain = audioContext.createGain();
+            noiseSource.connect(noiseGain);
+            
+            // Connect oscillators and noise to master
             osc1.connect(gain1);
             osc2.connect(gain2);
             osc3.connect(gain3);
+            osc4.connect(gain4);
             gain1.connect(masterGain);
             gain2.connect(masterGain);
             gain3.connect(masterGain);
+            gain4.connect(masterGain);
+            noiseGain.connect(masterGain);
             masterGain.connect(audioContext.destination);
             
-            // Fundamental tone (around D5, 587 Hz) - EVEN HIGHER
+            // Main tone (D5, 587 Hz)
             osc1.frequency.setValueAtTime(587, now);
-            osc1.frequency.exponentialRampToValueAtTime(550, now + 5);
+            osc1.frequency.exponentialRampToValueAtTime(560, now + 2);
             osc1.type = 'sine';
-            gain1.gain.setValueAtTime(0.25, now);
-            gain1.gain.exponentialRampToValueAtTime(0.001, now + 5);
+            gain1.gain.setValueAtTime(0.2, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
             
-            // First harmonic (3x fundamental)
-            osc2.frequency.setValueAtTime(1761, now);
-            osc2.frequency.exponentialRampToValueAtTime(1650, now + 5);
+            // Bright harmonic (2x, ~1174 Hz)
+            osc2.frequency.setValueAtTime(1174, now);
+            osc2.frequency.exponentialRampToValueAtTime(1100, now + 2);
             osc2.type = 'sine';
-            gain2.gain.setValueAtTime(0.15, now);
-            gain2.gain.exponentialRampToValueAtTime(0.001, now + 5);
+            gain2.gain.setValueAtTime(0.18, now);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 2);
             
-            // Second harmonic (5x fundamental) - adds warmth
-            osc3.frequency.setValueAtTime(2935, now);
-            osc3.frequency.exponentialRampToValueAtTime(2750, now + 5);
+            // High shimmer (4x, ~2348 Hz)
+            osc3.frequency.setValueAtTime(2348, now);
+            osc3.frequency.exponentialRampToValueAtTime(2150, now + 1.5);
             osc3.type = 'sine';
-            gain3.gain.setValueAtTime(0.1, now);
-            gain3.gain.exponentialRampToValueAtTime(0.001, now + 5);
+            gain3.gain.setValueAtTime(0.12, now);
+            gain3.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
             
-            // Master volume - long sustain
-            masterGain.gain.setValueAtTime(0.4, now);
-            masterGain.gain.exponentialRampToValueAtTime(0.05, now + 1);
-            masterGain.gain.exponentialRampToValueAtTime(0.001, now + 5);
+            // Very high chime (6x, ~3522 Hz)
+            osc4.frequency.setValueAtTime(3522, now);
+            osc4.frequency.exponentialRampToValueAtTime(3200, now + 1.2);
+            osc4.type = 'sine';
+            gain4.gain.setValueAtTime(0.08, now);
+            gain4.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+            
+            // Metallic noise shimmer
+            noiseGain.gain.setValueAtTime(0.15, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+            
+            // Master volume - quick attack, medium decay
+            masterGain.gain.setValueAtTime(0.5, now);
+            masterGain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
             
             osc1.start(now);
             osc2.start(now);
             osc3.start(now);
-            osc1.stop(now + 5);
-            osc2.stop(now + 5);
-            osc3.stop(now + 5);
+            osc4.start(now);
+            noiseSource.start(now);
+            osc1.stop(now + 2.5);
+            osc2.stop(now + 2.5);
+            osc3.stop(now + 2.5);
+            osc4.stop(now + 2.5);
+            noiseSource.stop(now + 2.5);
             
             // Status feedback
-            document.getElementById('status').textContent = '🔔 Tibetan Singing Bowl klingt...';
+            document.getElementById('status').textContent = '🔔 Tibetische Zimbeln klingen...';
             setTimeout(() => {
                 document.getElementById('status').textContent = '';
-            }, 5500);
+            }, 3000);
         }
         
         // Auto-play on load for quick test
