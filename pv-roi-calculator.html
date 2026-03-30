@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PV ROI Kalkulator - Photovoltaik Rentabilität berechnen">
+    <meta name="theme-color" content="#2ecc71">
+    <title>PV ROI Calculator</title>
+    <link rel="manifest" href="pv-roi-calculator-manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%232ecc71'/><text x='50' y='60' font-size='60' fill='white' text-anchor='middle'>☀</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><circle cx='96' cy='96' r='85' fill='%232ecc71'/><text x='96' y='120' font-size='100' fill='white' text-anchor='middle'>☀</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2ecc71;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --gray: #95a5a6;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--success);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: box-shadow 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--light);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .unit {
+            color: var(--gray);
+            font-weight: 600;
+            padding: 10px 12px;
+            background: var(--light);
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--success) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .result-box.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #e67e22 100%);
+        }
+
+        .result-box.danger {
+            background: linear-gradient(135deg, var(--accent) 0%, #c0392b 100%);
+        }
+
+        .result-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+            word-break: break-word;
+        }
+
+        .result-label {
+            font-size: 13px;
+            opacity: 0.95;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+
+        .scenario-section {
+            margin-top: 30px;
+        }
+
+        .scenario-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .scenario-item {
+            background: var(--light);
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .scenario-item strong {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .scenario-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .scenario-actions button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            margin-bottom: -2px;
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .error {
+            background: #fadbd8;
+            color: var(--accent);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .success {
+            background: #d5f4e6;
+            color: var(--success);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .info-badge {
+            display: inline-block;
+            background: rgba(52, 152, 219, 0.2);
+            color: var(--secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .comparison-table th {
+            background: var(--light);
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .comparison-table tr:hover {
+            background: var(--light);
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.2s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.2s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .loader {
+            border: 3px solid var(--light);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            white-space: normal;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            header, .header-actions {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            header h1 {
+                font-size: 22px;
+            }
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>☀️ PV ROI Calculator</h1>
+            <div class="header-actions">
+                <button class="btn-secondary btn-small" onclick="app.showInfo()">ℹ️ Info</button>
+                <button class="btn-primary btn-small" onclick="app.exportData()">💾 Export</button>
+                <button class="btn-primary btn-small" onclick="window.print()">🖨️ Print</button>
+            </div>
+        </header>
+
+        <div class="main-grid">
+            <!-- Inputs -->
+            <div class="card">
+                <div class="card-title">⚙️ Eingabeparameter</div>
+
+                <div class="tabs">
+                    <button class="tab-button active" onclick="app.switchTab('location')">Standort</button>
+                    <button class="tab-button" onclick="app.switchTab('technical')">Technik</button>
+                    <button class="tab-button" onclick="app.switchTab('financial')">Finanzen</button>
+                </div>
+
+                <!-- Standort Tab -->
+                <div id="location" class="tab-content active">
+                    <div class="form-group">
+                        <label>📍 PLZ Österreich</label>
+                        <input type="number" id="plz" placeholder="z.B. 1020" min="1000" max="9999" value="1020">
+                    </div>
+                    <div class="form-group">
+                        <label>☀️ Einstrahlung (kWh/m²a)</label>
+                        <input type="number" id="insolation" placeholder="z.B. 1150" min="800" max="1500" value="1150">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>🧭 Ausrichtung (°)
+                                <span class="tooltip">?
+                                    <span class="tooltiptext">-90° = Westen, 0° = Süd, +90° = Osten</span>
+                                </span>
+                            </label>
+                            <input type="number" id="orientation" placeholder="z.B. -45" min="-90" max="90" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>📐 Neigung (°)
+                                <span class="tooltip">?
+                                    <span class="tooltiptext">0° = Horizontal, 90° = Fassade</span>
+                                </span>
+                            </label>
+                            <input type="number" id="tilt" placeholder="z.B. 30" min="0" max="90" value="30">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technik Tab -->
+                <div id="technical" class="tab-content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>⚡ Anlagenleistung (kWp)</label>
+                            <input type="number" id="systemPower" placeholder="z.B. 6" min="0.5" max="100" step="0.1" value="6">
+                        </div>
+                        <div class="form-group">
+                            <label>📊 Modulwirkungsgrad (%)</label>
+                            <input type="number" id="moduleEfficiency" placeholder="z.B. 22" min="10" max="25" step="0.1" value="22">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>🔄 Wechselrichter-Wirkungsgrad (%)</label>
+                            <input type="number" id="inverterEfficiency" placeholder="z.B. 97" min="90" max="99" step="0.1" value="97">
+                        </div>
+                        <div class="form-group">
+                            <label>🏠 Aufstellung</label>
+                            <select id="mounting">
+                                <option value="Aufdach">Aufdach (hinterlüftet)</option>
+                                <option value="Fassade">Fassade</option>
+                                <option value="Freifläche">Freifläche</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>💡 Eigenverbrauchsquote (%)</label>
+                        <input type="number" id="selfConsumption" placeholder="z.B. 55" min="0" max="100" step="1" value="55">
+                    </div>
+                </div>
+
+                <!-- Finanzen Tab -->
+                <div id="financial" class="tab-content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>💵 Investitionskosten (€)</label>
+                            <input type="number" id="investmentCost" placeholder="z.B. 9000" min="0" step="100" value="9000">
+                        </div>
+                        <div class="form-group">
+                            <label>🎁 Förderung (€)</label>
+                            <input type="number" id="subsidy" placeholder="z.B. 2000" min="0" step="100" value="2000">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>⚡ Strompreis (€/kWh)</label>
+                            <input type="number" id="electricityPrice" placeholder="z.B. 0.25" min="0.01" max="1" step="0.01" value="0.25">
+                        </div>
+                        <div class="form-group">
+                            <label>📈 Strompreissteigerung (%/Jahr)</label>
+                            <input type="number" id="priceIncrease" placeholder="z.B. 2" min="0" max="10" step="0.1" value="2">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>🔧 Laufende Kosten (%/Jahr)</label>
+                            <input type="number" id="maintenanceCost" placeholder="z.B. 0.4" min="0" max="5" step="0.1" value="0.4">
+                        </div>
+                        <div class="form-group">
+                            <label>💱 Diskontrate (%/Jahr)</label>
+                            <input type="number" id="discountRate" placeholder="z.B. 4" min="0" max="20" step="0.1" value="4">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" style="width: 100%; margin-top: 15px;" onclick="app.calculate()">🧮 Berechnen</button>
+            </div>
+
+            <!-- Results -->
+            <div class="card">
+                <div class="card-title">📊 Ergebnisse</div>
+                <div id="resultError" class="error" style="display: none;"></div>
+                <div class="results-grid">
+                    <div class="result-box" id="roiResult">
+                        <div class="result-label">ROI</div>
+                        <div class="result-value">—</div>
+                    </div>
+                    <div class="result-box" id="paybackResult">
+                        <div class="result-label">Amortisationszeit</div>
+                        <div class="result-value">—</div>
+                    </div>
+                    <div class="result-box" id="npvResult">
+                        <div class="result-label">Nettobarwert (€)</div>
+                        <div class="result-value">—</div>
+                    </div>
+                    <div class="result-box" id="irrResult">
+                        <div class="result-label">Interne Rendite (IRR)</div>
+                        <div class="result-value">—</div>
+                    </div>
+                    <div class="result-box full-width" id="energyResult">
+                        <div class="result-label">Jährliche Stromerzeugung</div>
+                        <div class="result-value">—</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: var(--light); border-radius: 8px;">
+                    <div class="card-title" style="margin: 0;">💰 Cashflow Übersicht</div>
+                    <table style="width: 100%; font-size: 12px; margin-top: 10px;">
+                        <tr style="border-bottom: 2px solid #ccc;">
+                            <td style="font-weight: 600;">Investition (€)</td>
+                            <td id="cfInvestment" style="text-align: right; font-weight: 600;">—</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="font-weight: 600;">- Förderung (€)</td>
+                            <td id="cfSubsidy" style="text-align: right;">—</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="font-weight: 600;">= Eigenkapital (€)</td>
+                            <td id="cfEquity" style="text-align: right; font-weight: 600; color: var(--primary);">—</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td>Jährlicher Ertrag (Ø, €)</td>
+                            <td id="cfAnnualRevenue" style="text-align: right;">—</td>
+                        </tr>
+                        <tr>
+                            <td>Jährliche Kosten (Ø, €)</td>
+                            <td id="cfAnnualCosts" style="text-align: right;">—</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="card">
+            <div class="card-title">📈 Visualisierung</div>
+            <div class="tabs">
+                <button class="tab-button active" onclick="app.switchChart('payback')">Payback-Kurve</button>
+                <button class="tab-button" onclick="app.switchChart('cashflow')">Jährlicher Cashflow</button>
+                <button class="tab-button" onclick="app.switchChart('cumulative')">Kumulativ</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="paybackChart" class="chart-content active"></canvas>
+                <canvas id="cashflowChart" class="chart-content" style="display: none;"></canvas>
+                <canvas id="cumulativeChart" class="chart-content" style="display: none;"></canvas>
+            </div>
+        </div>
+
+        <!-- Scenarios -->
+        <div class="card">
+            <div class="card-title">🔄 Szenarien vergleichen</div>
+            <button class="btn-primary" onclick="app.saveScenario()">💾 Aktuelles Szenario speichern</button>
+            <div class="scenario-section">
+                <div id="scenarioList" class="scenario-list"></div>
+            </div>
+            <div id="comparisonDiv" style="display: none; margin-top: 20px;">
+                <h3 style="margin-bottom: 10px;">Szenarien-Vergleich</h3>
+                <table class="comparison-table" id="comparisonTable"></table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">ℹ️ Über diesen Kalkulator</div>
+            <p style="margin-bottom: 15px; line-height: 1.6;">
+                Der PV ROI Calculator berechnet die Rentabilität von Photovoltaikanlagen basierend auf österreichischen Parametern.
+            </p>
+            <h3 style="margin-top: 20px; margin-bottom: 10px; font-size: 14px;">Wichtige Kennzahlen:</h3>
+            <ul style="margin-left: 20px; font-size: 13px; line-height: 1.8;">
+                <li><strong>ROI:</strong> Return on Investment in Prozent</li>
+                <li><strong>Payback:</strong> Jahre bis zur Amortisation</li>
+                <li><strong>NPV (Nettobarwert):</strong> Gegenwartswert aller zukünftigen Cashflows</li>
+                <li><strong>IRR:</strong> Interne Rendite (Diskontsatz für NPV=0)</li>
+            </ul>
+            <h3 style="margin-top: 20px; margin-bottom: 10px; font-size: 14px;">Disclaimer:</h3>
+            <p style="font-size: 12px; color: var(--gray); line-height: 1.6;">
+                Dieses Tool bietet Richtwerte und ersetzt keine professionelle Beratung. Förderungen und Strompreise können variieren.
+            </p>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="app.closeModal()">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scenario Modal -->
+    <div id="scenarioModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">💾 Szenario speichern</div>
+            <div class="form-group">
+                <label>Name des Szenarios</label>
+                <input type="text" id="scenarioName" placeholder="z.B. Standardanlage" value="">
+            </div>
+            <div class="form-group">
+                <label>Beschreibung (optional)</label>
+                <textarea id="scenarioDesc" placeholder="z.B. 6kWp Anlage mit 55% Eigenverbrauch" style="width: 100%; padding: 10px; border: 2px solid var(--light); border-radius: 6px; resize: vertical; height: 80px;"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="app.closeModal()">Abbrechen</button>
+                <button class="btn-primary" onclick="app.confirmScenario()">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="pv-roi-calculator-sw.js"></script>
+    <script>
+        // Chart.js alternative - simple canvas drawing
+        class SimpleChart {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.setSize();
+                window.addEventListener('resize', () => this.setSize());
+            }
+
+            setSize() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                this.canvas.width = rect.width - 40;
+                this.canvas.height = 400;
+            }
+
+            clear() {
+                this.ctx.fillStyle = 'white';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            drawPaybackChart(data) {
+                this.clear();
+                const { years, cumulative, paybackYear } = data;
+                if (!years || years.length === 0) return;
+
+                const padding = { top: 40, right: 40, bottom: 40, left: 60 };
+                const graphWidth = this.canvas.width - padding.left - padding.right;
+                const graphHeight = this.canvas.height - padding.top - padding.bottom;
+
+                const minValue = Math.min(...cumulative);
+                const maxValue = Math.max(...cumulative);
+                const range = maxValue - minValue || 1;
+
+                this.ctx.fillStyle = '#2c3e50';
+                this.ctx.font = 'bold 14px sans-serif';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('Kumulativer Cashflow', this.canvas.width / 2, 25);
+
+                this.ctx.strokeStyle = '#bdc3c7';
+                this.ctx.lineWidth = 1;
+
+                // Y-axis labels
+                this.ctx.font = '12px sans-serif';
+                this.ctx.textAlign = 'right';
+                this.ctx.fillStyle = '#7f8c8d';
+                for (let i = 0; i <= 5; i++) {
+                    const value = minValue + (range / 5) * i;
+                    const y = padding.top + graphHeight - (graphHeight / 5) * i;
+                    this.ctx.fillText(Math.round(value).toLocaleString('de-DE'), padding.left - 10, y + 5);
+                    this.ctx.strokeStyle = '#ecf0f1';
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(padding.left, y);
+                    this.ctx.lineTo(this.canvas.width - padding.right, y);
+                    this.ctx.stroke();
+                }
+
+                // Draw line
+                this.ctx.strokeStyle = '#2ecc71';
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath();
+
+                for (let i = 0; i < years.length; i++) {
+                    const x = padding.left + (graphWidth / (years.length - 1)) * i;
+                    const y = padding.top + graphHeight - ((cumulative[i] - minValue) / range) * graphHeight;
+                    if (i === 0) this.ctx.moveTo(x, y);
+                    else this.ctx.lineTo(x, y);
+                }
+                this.ctx.stroke();
+
+                // Zero line
+                const zeroY = padding.top + graphHeight - ((0 - minValue) / range) * graphHeight;
+                this.ctx.strokeStyle = '#e74c3c';
+                this.ctx.lineWidth = 2;
+                this.ctx.setLineDash([5, 5]);
+                this.ctx.beginPath();
+                this.ctx.moveTo(padding.left, zeroY);
+                this.ctx.lineTo(this.canvas.width - padding.right, zeroY);
+                this.ctx.stroke();
+                this.ctx.setLineDash([]);
+
+                // Payback marker
+                if (paybackYear > 0 && paybackYear < years.length) {
+                    const x = padding.left + (graphWidth / (years.length - 1)) * paybackYear;
+                    this.ctx.fillStyle = '#f39c12';
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, zeroY, 6, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+
+                // X-axis
+                this.ctx.strokeStyle = '#2c3e50';
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.moveTo(padding.left, padding.top + graphHeight);
+                this.ctx.lineTo(this.canvas.width - padding.right, padding.top + graphHeight);
+                this.ctx.stroke();
+
+                // X-axis labels
+                this.ctx.fillStyle = '#7f8c8d';
+                this.ctx.font = '12px sans-serif';
+                this.ctx.textAlign = 'center';
+                const step = Math.ceil(years.length / 10);
+                for (let i = 0; i < years.length; i += step) {
+                    const x = padding.left + (graphWidth / (years.length - 1)) * i;
+                    this.ctx.fillText(years[i], x, this.canvas.height - 10);
+                }
+
+                // Y-axis label
+                this.ctx.save();
+                this.ctx.translate(15, this.canvas.height / 2);
+                this.ctx.rotate(-Math.PI / 2);
+                this.ctx.fillStyle = '#7f8c8d';
+                this.ctx.font = '12px sans-serif';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('€', 0, 0);
+                this.ctx.restore();
+            }
+
+            drawCashflowChart(data) {
+                this.clear();
+                const { years, annual } = data;
+                if (!years || years.length === 0) return;
+
+                const padding = { top: 40, right: 40, bottom: 40, left: 60 };
+                const graphWidth = this.canvas.width - padding.left - padding.right;
+                const graphHeight = this.canvas.height - padding.top - padding.bottom;
+
+                const maxValue = Math.max(...annual);
+                const minValue = Math.min(...annual);
+                const range = Math.max(maxValue - minValue, 1);
+
+                this.ctx.fillStyle = '#2c3e50';
+                this.ctx.font = 'bold 14px sans-serif';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('Jährlicher Cashflow', this.canvas.width / 2, 25);
+
+                const barWidth = graphWidth / (years.length * 1.5);
+
+                for (let i = 0; i < years.length; i++) {
+                    const x = padding.left + (graphWidth / years.length) * i + (graphWidth / years.length) / 2 - barWidth / 2;
+                    const value = annual[i];
+                    const height = (value / (maxValue - minValue)) * graphHeight;
+                    const y = padding.top + graphHeight - height;
+
+                    this.ctx.fillStyle = value >= 0 ? '#2ecc71' : '#e74c3c';
+                    this.ctx.fillRect(x, y, barWidth, height);
+                }
+
+                // Zero line
+                const zeroY = padding.top + graphHeight - ((0 - minValue) / range) * graphHeight;
+                this.ctx.strokeStyle = '#bdc3c7';
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.moveTo(padding.left, zeroY);
+                this.ctx.lineTo(this.canvas.width - padding.right, zeroY);
+                this.ctx.stroke();
+
+                // Axes
+                this.ctx.strokeStyle = '#2c3e50';
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.moveTo(padding.left, padding.top + graphHeight);
+                this.ctx.lineTo(this.canvas.width - padding.right, padding.top + graphHeight);
+                this.ctx.stroke();
+
+                // Y-axis labels
+                this.ctx.fillStyle = '#7f8c8d';
+                this.ctx.font = '12px sans-serif';
+                this.ctx.textAlign = 'right';
+                for (let i = 0; i <= 5; i++) {
+                    const value = minValue + (range / 5) * i;
+                    const y = padding.top + graphHeight - (graphHeight / 5) * i;
+                    this.ctx.fillText(Math.round(value).toLocaleString('de-DE'), padding.left - 10, y + 5);
+                }
+
+                // X-axis labels
+                this.ctx.textAlign = 'center';
+                const step = Math.ceil(years.length / 10);
+                for (let i = 0; i < years.length; i += step) {
+                    const x = padding.left + (graphWidth / years.length) * i + (graphWidth / years.length) / 2;
+                    this.ctx.fillText(years[i], x, this.canvas.height - 10);
+                }
+            }
+
+            drawCumulativeChart(data) {
+                this.drawPaybackChart(data); // Same as payback
+            }
+        }
+
+        class PVCalculator {
+            constructor() {
+                this.scenarios = this.loadScenarios();
+                this.paybackChart = new SimpleChart('paybackChart');
+                this.cashflowChart = new SimpleChart('cashflowChart');
+                this.cumulativeChart = new SimpleChart('cumulativeChart');
+                this.lastResults = null;
+
+                // Register service worker
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('pv-roi-calculator-sw.js').catch(err => {
+                        console.log('SW registration failed:', err);
+                    });
+                }
+
+                this.updateScenarioList();
+            }
+
+            // Get inputs
+            getInputs() {
+                return {
+                    plz: parseInt(document.getElementById('plz').value) || 1020,
+                    insolation: parseFloat(document.getElementById('insolation').value) || 1150,
+                    orientation: parseFloat(document.getElementById('orientation').value) || 0,
+                    tilt: parseFloat(document.getElementById('tilt').value) || 30,
+                    systemPower: parseFloat(document.getElementById('systemPower').value) || 6,
+                    moduleEfficiency: parseFloat(document.getElementById('moduleEfficiency').value) || 22,
+                    inverterEfficiency: parseFloat(document.getElementById('inverterEfficiency').value) || 97,
+                    mounting: document.getElementById('mounting').value,
+                    selfConsumption: parseFloat(document.getElementById('selfConsumption').value) || 55,
+                    investmentCost: parseFloat(document.getElementById('investmentCost').value) || 9000,
+                    subsidy: parseFloat(document.getElementById('subsidy').value) || 2000,
+                    electricityPrice: parseFloat(document.getElementById('electricityPrice').value) || 0.25,
+                    priceIncrease: parseFloat(document.getElementById('priceIncrease').value) || 2,
+                    maintenanceCost: parseFloat(document.getElementById('maintenanceCost').value) || 0.4,
+                    discountRate: parseFloat(document.getElementById('discountRate').value) || 4
+                };
+            }
+
+            // Main calculation
+            calculate() {
+                const inputs = this.getInputs();
+                const errorDiv = document.getElementById('resultError');
+                errorDiv.style.display = 'none';
+
+                try {
+                    // Energy calculation
+                    const tiltFactor = this.getTiltFactor(inputs.tilt);
+                    const orientationFactor = this.getOrientationFactor(inputs.orientation);
+                    const systemEfficiency = (inputs.moduleEfficiency / 100) * (inputs.inverterEfficiency / 100);
+
+                    if (inputs.mounting === 'Fassade') systemEfficiency *= 0.81;
+                    else if (inputs.mounting === 'Aufdach') systemEfficiency *= 0.86;
+                    else systemEfficiency *= 0.87;
+
+                    const adjustedInsolation = inputs.insolation * tiltFactor * orientationFactor;
+                    const annualEnergy = inputs.systemPower * adjustedInsolation * systemEfficiency;
+
+                    if (annualEnergy <= 0) throw new Error('Jährliche Stromerzeugung ist null oder negativ');
+
+                    // Cash flow calculation (30 years)
+                    const years = [];
+                    const annual = [];
+                    const cumulative = [];
+                    let npvSum = 0;
+                    let paybackYear = -1;
+                    let cumulativeValue = -(inputs.investmentCost - inputs.subsidy);
+
+                    for (let year = 0; year <= 30; year++) {
+                        years.push(year);
+
+                        if (year === 0) {
+                            annual.push(-(inputs.investmentCost - inputs.subsidy));
+                            cumulative.push(cumulativeValue);
+                        } else {
+                            // Energy price with inflation
+                            const currentPrice = inputs.electricityPrice * Math.pow(1 + inputs.priceIncrease / 100, year - 1);
+
+                            // Revenue (self-consumption + feed-in)
+                            const selfConsumedEnergy = annualEnergy * (inputs.selfConsumption / 100);
+                            const feedInEnergy = annualEnergy * (1 - inputs.selfConsumption / 100);
+                            const revenue = selfConsumedEnergy * currentPrice + feedInEnergy * currentPrice;
+
+                            // Costs
+                            const costs = (inputs.investmentCost * inputs.maintenanceCost / 100);
+
+                            // Cash flow
+                            const cashflow = revenue - costs;
+                            annual.push(cashflow);
+
+                            // Cumulative with NPV
+                            const discountFactor = Math.pow(1 + inputs.discountRate / 100, year);
+                            const discountedCashflow = cashflow / discountFactor;
+                            npvSum += discountedCashflow;
+                            cumulativeValue += cashflow;
+                            cumulative.push(cumulativeValue);
+
+                            if (paybackYear === -1 && cumulativeValue >= 0) {
+                                paybackYear = year;
+                            }
+                        }
+                    }
+
+                    // Remove year 0 from annual for display
+                    const annualDisplay = annual.slice(1);
+                    const cumulativeDisplay = cumulative.slice(1);
+
+                    // Calculate IRR using Newton-Raphson
+                    const irr = this.calculateIRR(annual);
+
+                    // Calculate ROI
+                    const totalProfit = cumulativeDisplay[cumulativeDisplay.length - 1];
+                    const roi = (totalProfit / (inputs.investmentCost - inputs.subsidy)) * 100;
+
+                    // Store results
+                    this.lastResults = {
+                        years: years.slice(1),
+                        annual: annualDisplay,
+                        cumulative: cumulativeDisplay,
+                        paybackYear: paybackYear,
+                        npv: npvSum,
+                        irr: irr,
+                        roi: roi,
+                        annualEnergy: annualEnergy,
+                        investmentCost: inputs.investmentCost,
+                        subsidy: inputs.subsidy,
+                        equity: inputs.investmentCost - inputs.subsidy
+                    };
+
+                    this.displayResults(this.lastResults);
+                    this.paybackChart.drawPaybackChart({
+                        years: this.lastResults.years,
+                        cumulative: this.lastResults.cumulative,
+                        paybackYear: this.lastResults.paybackYear
+                    });
+
+                } catch (error) {
+                    errorDiv.textContent = '❌ ' + error.message;
+                    errorDiv.style.display = 'block';
+                }
+            }
+
+            calculateIRR(cashflows, initialGuess = 0.1) {
+                const maxIterations = 100;
+                const tolerance = 0.0001;
+                let rate = initialGuess;
+
+                for (let i = 0; i < maxIterations; i++) {
+                    let npv = 0, npvDerivative = 0;
+
+                    for (let t = 0; t < cashflows.length; t++) {
+                        npv += cashflows[t] / Math.pow(1 + rate, t);
+                        if (t > 0) npvDerivative -= t * cashflows[t] / Math.pow(1 + rate, t + 1);
+                    }
+
+                    if (Math.abs(npv) < tolerance) return rate * 100;
+                    rate = rate - npv / npvDerivative;
+
+                    if (rate < -0.99) rate = -0.99;
+                }
+
+                return rate * 100;
+            }
+
+            getTiltFactor(tilt) {
+                const tiltRad = (tilt * Math.PI) / 180;
+                return Math.cos(tiltRad) + 0.1 * Math.sin(tiltRad);
+            }
+
+            getOrientationFactor(orientation) {
+                const orientRad = (orientation * Math.PI) / 180;
+                return 0.95 + 0.05 * Math.cos(orientRad);
+            }
+
+            displayResults(results) {
+                const format = (num, decimals = 0) => {
+                    if (num === null || num === undefined) return '—';
+                    return num.toFixed(decimals).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                };
+
+                document.querySelector('#roiResult .result-value').textContent = format(results.roi, 1) + '%';
+                document.querySelector('#paybackResult .result-value').textContent = results.paybackYear > 0 ? format(results.paybackYear, 1) + ' Jahre' : '—';
+                document.querySelector('#npvResult .result-value').textContent = format(results.npv, 0) + ' €';
+                document.querySelector('#irrResult .result-value').textContent = format(results.irr, 1) + '%';
+                document.querySelector('#energyResult .result-value').textContent = format(results.annualEnergy, 0) + ' kWh';
+
+                document.getElementById('cfInvestment').textContent = format(results.investmentCost, 0) + ' €';
+                document.getElementById('cfSubsidy').textContent = format(results.subsidy, 0) + ' €';
+                document.getElementById('cfEquity').textContent = format(results.equity, 0) + ' €';
+                document.getElementById('cfAnnualRevenue').textContent = format(results.annual.slice(1, 6).reduce((a, b) => a + b, 0) / 5, 0) + ' €';
+                document.getElementById('cfAnnualCosts').textContent = format(results.investmentCost * 0.004, 0) + ' €';
+            }
+
+            switchTab(tabName) {
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+                document.getElementById(tabName).classList.add('active');
+                event.target.classList.add('active');
+            }
+
+            switchChart(chartName) {
+                document.querySelectorAll('.chart-content').forEach(el => {
+                    el.style.display = 'none';
+                    el.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+
+                if (chartName === 'payback') {
+                    document.getElementById('paybackChart').style.display = '';
+                    document.getElementById('paybackChart').classList.add('active');
+                } else if (chartName === 'cashflow') {
+                    document.getElementById('cashflowChart').style.display = '';
+                    this.cashflowChart.drawCashflowChart(this.lastResults);
+                } else if (chartName === 'cumulative') {
+                    document.getElementById('cumulativeChart').style.display = '';
+                    this.cumulativeChart.drawCumulativeChart(this.lastResults);
+                }
+
+                event.target.classList.add('active');
+            }
+
+            saveScenario() {
+                document.getElementById('scenarioName').value = '';
+                document.getElementById('scenarioDesc').value = '';
+                document.getElementById('scenarioModal').classList.add('active');
+            }
+
+            confirmScenario() {
+                const name = document.getElementById('scenarioName').value.trim();
+                if (!name) {
+                    alert('Bitte einen Namen eingeben');
+                    return;
+                }
+
+                const scenario = {
+                    id: Date.now(),
+                    name: name,
+                    desc: document.getElementById('scenarioDesc').value,
+                    inputs: this.getInputs(),
+                    results: this.lastResults,
+                    timestamp: new Date().toLocaleString('de-DE')
+                };
+
+                this.scenarios.push(scenario);
+                this.saveScenarios();
+                this.updateScenarioList();
+                this.closeModal();
+            }
+
+            loadScenario(id) {
+                const scenario = this.scenarios.find(s => s.id == id);
+                if (!scenario) return;
+
+                const inputs = scenario.inputs;
+                document.getElementById('plz').value = inputs.plz;
+                document.getElementById('insolation').value = inputs.insolation;
+                document.getElementById('orientation').value = inputs.orientation;
+                document.getElementById('tilt').value = inputs.tilt;
+                document.getElementById('systemPower').value = inputs.systemPower;
+                document.getElementById('moduleEfficiency').value = inputs.moduleEfficiency;
+                document.getElementById('inverterEfficiency').value = inputs.inverterEfficiency;
+                document.getElementById('mounting').value = inputs.mounting;
+                document.getElementById('selfConsumption').value = inputs.selfConsumption;
+                document.getElementById('investmentCost').value = inputs.investmentCost;
+                document.getElementById('subsidy').value = inputs.subsidy;
+                document.getElementById('electricityPrice').value = inputs.electricityPrice;
+                document.getElementById('priceIncrease').value = inputs.priceIncrease;
+                document.getElementById('maintenanceCost').value = inputs.maintenanceCost;
+                document.getElementById('discountRate').value = inputs.discountRate;
+
+                this.calculate();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            deleteScenario(id) {
+                if (confirm('Szenario wirklich löschen?')) {
+                    this.scenarios = this.scenarios.filter(s => s.id != id);
+                    this.saveScenarios();
+                    this.updateScenarioList();
+                }
+            }
+
+            updateScenarioList() {
+                const container = document.getElementById('scenarioList');
+                container.innerHTML = '';
+
+                if (this.scenarios.length === 0) {
+                    container.innerHTML = '<p style="color: #7f8c8d; font-size: 13px; text-align: center;">Noch keine Szenarien gespeichert</p>';
+                    document.getElementById('comparisonDiv').style.display = 'none';
+                    return;
+                }
+
+                this.scenarios.forEach(scenario => {
+                    const item = document.createElement('div');
+                    item.className = 'scenario-item';
+                    item.innerHTML = `
+                        <div>
+                            <strong>${scenario.name}</strong>
+                            <div style="font-size: 11px; color: #7f8c8d; margin-top: 3px;">
+                                ${scenario.desc ? scenario.desc + ' • ' : ''}${scenario.timestamp}
+                            </div>
+                        </div>
+                        <div class="scenario-actions">
+                            <button class="btn-secondary btn-small" onclick="app.loadScenario(${scenario.id})">Laden</button>
+                            <button class="btn-secondary btn-small" onclick="app.deleteScenario(${scenario.id})" style="background: #e74c3c;">Löschen</button>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+
+                if (this.scenarios.length >= 2) {
+                    this.displayComparison();
+                }
+            }
+
+            displayComparison() {
+                const table = document.getElementById('comparisonTable');
+                table.innerHTML = `
+                    <tr>
+                        <th>Szenario</th>
+                        <th>ROI</th>
+                        <th>Payback</th>
+                        <th>NPV (€)</th>
+                        <th>IRR</th>
+                    </tr>
+                `;
+
+                this.scenarios.forEach(scenario => {
+                    const r = scenario.results;
+                    const row = table.insertRow();
+                    row.innerHTML = `
+                        <td><strong>${scenario.name}</strong></td>
+                        <td>${r && r.roi ? r.roi.toFixed(1) + '%' : '—'}</td>
+                        <td>${r && r.paybackYear > 0 ? r.paybackYear.toFixed(1) + 'a' : '—'}</td>
+                        <td>${r && r.npv ? Math.round(r.npv).toLocaleString('de-DE') : '—'}</td>
+                        <td>${r && r.irr ? r.irr.toFixed(1) + '%' : '—'}</td>
+                    `;
+                });
+
+                document.getElementById('comparisonDiv').style.display = 'block';
+            }
+
+            saveScenarios() {
+                localStorage.setItem('pv_scenarios', JSON.stringify(this.scenarios));
+            }
+
+            loadScenarios() {
+                const stored = localStorage.getItem('pv_scenarios');
+                return stored ? JSON.parse(stored) : [];
+            }
+
+            exportData() {
+                const inputs = this.getInputs();
+                const data = {
+                    inputs: inputs,
+                    results: this.lastResults,
+                    scenarios: this.scenarios,
+                    exported: new Date().toLocaleString('de-DE')
+                };
+
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `pv-calculation-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            showInfo() {
+                document.getElementById('infoModal').classList.add('active');
+            }
+
+            closeModal() {
+                document.getElementById('infoModal').classList.remove('active');
+                document.getElementById('scenarioModal').classList.remove('active');
+            }
+        }
+
+        // Initialize
+        const app = new PVCalculator();
+        app.calculate();
+
+        // Close modals on outside click
+        window.onclick = (event) => {
+            const modal = event.target;
+            if (modal.classList.contains('modal')) {
+                modal.classList.remove('active');
+            }
+        };
+    </script>
+</body>
+</html>
