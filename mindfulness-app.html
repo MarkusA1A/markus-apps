@@ -1067,31 +1067,12 @@
             },
 
             playBellSound() {
-                // Try native audio element first, then Web Audio API fallback
-                try {
-                    const tingshaAudio = document.getElementById('tingshaAudio');
-                    if (tingshaAudio && tingshaAudio.readyState >= 2) {
-                        // Audio is loaded, try to play
-                        tingshaAudio.currentTime = 0;
-                        const playPromise = tingshaAudio.play();
-                        if (playPromise) {
-                            playPromise.catch(err => {
-                                console.log('Native audio failed, using Web Audio:', err.message);
-                                this.playBellWithWebAudio();
-                            });
-                        }
-                    } else {
-                        // Fallback immediately
-                        this.playBellWithWebAudio();
-                    }
-                } catch (err) {
-                    console.log('Bell error:', err);
-                    this.playBellWithWebAudio();
-                }
+                // Use Web Audio API directly (Safari iOS compatible)
+                this.playBellWithWebAudio();
             },
             
             playBellWithWebAudio() {
-                // Web Audio API fallback (works on all devices)
+                // Web Audio API - works on all devices including Safari iOS
                 try {
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     
@@ -1101,27 +1082,42 @@
                     }
                     
                     const now = audioContext.currentTime;
-                    const duration = 2.5;
+                    const duration = 3.5; // Bell ring duration
                     
-                    // Multiple harmonics for richer bell sound
-                    const frequencies = [392, 784, 1176]; // G4, G5, G6
-                    const gains = [0.4, 0.25, 0.15];
+                    // Create main output gain (master volume)
+                    const masterGain = audioContext.createGain();
+                    masterGain.gain.setValueAtTime(0.8, now);
+                    masterGain.connect(audioContext.destination);
                     
-                    frequencies.forEach((freq, idx) => {
+                    // Bell frequencies (harmonic series for bell-like tone)
+                    const frequencies = [
+                        { freq: 392, gain: 0.5, decay: 3.5 },   // G4 - fundamental
+                        { freq: 784, gain: 0.3, decay: 3.0 },   // G5 - 2nd harmonic
+                        { freq: 1176, gain: 0.2, decay: 2.5 },  // G6 - 3rd harmonic
+                        { freq: 1568, gain: 0.1, decay: 2.0 }   // G7 - 4th harmonic
+                    ];
+                    
+                    frequencies.forEach(({ freq, gain: initGain, decay }) => {
                         const osc = audioContext.createOscillator();
                         const gain = audioContext.createGain();
+                        
                         osc.connect(gain);
-                        gain.connect(audioContext.destination);
-                        osc.frequency.setValueAtTime(freq, now);
-                        osc.frequency.exponentialRampToValueAtTime(freq * 0.95, now + duration);
+                        gain.connect(masterGain);
+                        
                         osc.type = 'sine';
-                        gain.gain.setValueAtTime(gains[idx], now);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+                        osc.frequency.setValueAtTime(freq, now);
+                        osc.frequency.exponentialRampToValueAtTime(freq * 0.98, now + decay);
+                        
+                        gain.gain.setValueAtTime(initGain, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + decay);
+                        
                         osc.start(now);
-                        osc.stop(now + duration);
+                        osc.stop(now + decay);
                     });
+                    
+                    console.log('🔔 Bell sound playing via Web Audio');
                 } catch (err) {
-                    console.log('Web Audio also failed:', err);
+                    console.log('Web Audio error:', err);
                 }
             },
 
