@@ -472,6 +472,68 @@
             font-weight: 600;
         }
 
+        /* Pre-Meditation Countdown */
+        .countdown-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .countdown-screen.active {
+            display: flex;
+        }
+
+        .countdown-display {
+            font-size: 8rem;
+            font-weight: 700;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-variant-numeric: tabular-nums;
+            margin: 0;
+            line-height: 1;
+            animation: countdown-pulse 0.6s ease-out;
+        }
+
+        @keyframes countdown-pulse {
+            0% { transform: scale(1.2); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .countdown-label {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            opacity: 0.9;
+            letter-spacing: 2px;
+        }
+
+        .countdown-subtitle {
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        .countdown-dot {
+            margin-top: 3rem;
+            font-size: 2rem;
+            animation: dot-blink 1s infinite;
+        }
+
+        @keyframes dot-blink {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
         /* Notification */
         .notification {
             position: fixed;
@@ -491,6 +553,11 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             header h1 {
@@ -507,6 +574,10 @@
 
             .timer-display {
                 font-size: 3rem;
+            }
+
+            .countdown-display {
+                font-size: 5rem;
             }
 
             .stats {
@@ -684,8 +755,14 @@
         <footer>
             <p>Mindfulness App | Basierend auf Jon Kabat-Zinn MBSR | <a href="#" onclick="app.registerServiceWorker()">Offline verfügbar</a></p>
             <p style="margin-top: 0.5rem; font-size: 0.8rem;">Nicht für medizinische Ratschläge bestimmt. Konsultiere einen Fachmann bei gesundheitlichen Bedenken.</p>
+            <p style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-secondary);">🔔 Tingsha Sound: CC0 by steffcaffrey (Freesound)</p>
         </footer>
     </div>
+
+    <!-- Tingsha Cymbal Sound (CC0 by steffcaffrey) -->
+    <audio id="tingshaAudio" preload="auto">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYyLjEyLjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAABOAAAiCAAUFxodHSAjJyoqLTAzMzY5PD8/QkVISEtOUVRUV1peXmFkZ2pqbXBzc3Z5fH9/goWIi4uOkZWVmJueoaGkp7qqrbCztra5vL+/wsXIzMzP0tXV2Nve4eHk5+rq7fDz9vb5/P8AAAAATGF2YzYyLjI4AAAAAAAAAAAAAAAAJAQ4AAAAAAAAIgjrwE55AAAAAAD/+6DEAADBwAFHwAAAKFkDJhBnsE1VMCaAAAAAAA8PzwdHD5KLJKAxIkAkOH0IMYoBRKOngoKCgUFVTEFNRTMuMTAwVVVVVVVVVQygAAC7wMYHQnYigGrCtwZR8hiFTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUQzgAAAtBE7K3eKgCBuAw74tllMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQRgAADVckK0OIB0QIG6PxZQszECdUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHBaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AAA5qZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoCC4AABqZJRtBrgyARKiVCOXwiLVTEFNRTMuMTAwVVVVVf/7EMTggcHhaBkrADzCYCEDJWAJIEyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq" type="audio/mpeg">
+    </audio>
 
     <script>
         // Meditation Content
@@ -697,6 +774,7 @@
                 durations: [30, 45],
                 script: `Setze dich bequem hin oder lege dich hin. Schließe sanft deine Augen. Beginne damit, deine Aufmerksamkeit auf die Spitze deines Kopfes zu richten. Beobachte alle Empfindungen ohne Urteil. Langsam bewege dein Bewusstsein nach unten: Stirn, Augen, Nase, Mund, Kinn. Jetzt zur Kehle, Nacken, Schultern. Spüre die Spannung und lasse sie los. Bewege deine Aufmerksamkeit zu deinen Armen, Unterarmen, Händen und Fingern. Fühle jeden Finger einzeln. Jetzt zu deiner Brust. Atme tief ein und aus. Spüre deinen Herzbeat. Bewege deine Aufmerksamkeit zu deinem Bauch und deinen Hüften. Beobachte, wie sich dein Bauch mit jedem Atemzug bewegt. Jetzt zu deinem unteren Rücken. Entspanne die Muskeln dort. Bewege dich weiter zu deinen Oberschenkeln, Knien, Waden und Füßen. Spüre den Kontakt deiner Füße mit dem Boden. Durchlaufe deinen ganzen Körper nochmal mit Wohlwollen und Dankbarkeit. Bleibe in diesem Zustand der Ruhe und Frieden.`
             },
+
             breathMeditation: {
                 title: 'Atemmeditation',
                 icon: '💨',
@@ -737,7 +815,7 @@
                 icon: '⏸️',
                 description: 'Kurze Übung für Zwischendurch',
                 durations: [2, 3, 5],
-                script: `Stoppe alles. Pausiere. Wo bist du? Was machst du? Spüre deine Füße am Boden. Atme tief ein. Zähle bis 4. Halte an bis 4. Atme aus bis 4. Spüre deinen Körper. Entspanne deinen Nacken. Rollen Sie deine Schultern. Schließe deine Augen, wenn möglich. Fühle den gegenwärtigen Moment. Du brauchst nicht überall zu sein außer hier. Du brauchst nicht alles zu tun außer zu atmen. Dies ist genug. Du bist genug. Öffne deine Augen. Du bist erfrischter, klarer, gegenwärtiger.`
+                script: `Stoppe alles. Pausiere. Wo bist du? Was machst du? Spüle deine Füße am Boden. Atme tief ein. Zähle bis 4. Halte an bis 4. Atme aus bis 4. Spüre deinen Körper. Entspanne deinen Nacken. Rollen Sie deine Schultern. Schließe deine Augen, wenn möglich. Fühle den gegenwärtigen Moment. Du brauchst nicht überall zu sein außer hier. Du brauchst nicht alles zu tun außer zu atmen. Dies ist genug. Du bist genug. Öffne deine Augen. Du bist erfrischter, klarer, gegenwärtiger.`
             }
         };
 
@@ -757,7 +835,7 @@
                 this.renderGallery();
                 this.setupNavigation();
                 this.registerServiceWorker();
-                console.log('Mindfulness App loaded');
+                console.log('Mindfulness App with 10-Second Countdown loaded');
             },
 
             renderGallery() {
@@ -817,6 +895,56 @@
                     return;
                 }
 
+                // Show 10-second countdown screen
+                this.showCountdownScreen();
+            },
+
+            showCountdownScreen() {
+                let countdownTime = 10;
+                let soundPlayed = false;
+                const self = this;
+                
+                const countdownScreen = document.createElement('div');
+                countdownScreen.className = 'countdown-screen active';
+                countdownScreen.innerHTML = `
+                    <div class="countdown-display" id="countdownDisplay">10</div>
+                    <div class="countdown-label">Meditation startet...</div>
+                    <div class="countdown-subtitle">Bereit?</div>
+                    <div class="countdown-dot">●</div>
+                `;
+                document.body.appendChild(countdownScreen);
+
+                const countdownDisplay = document.getElementById('countdownDisplay');
+                
+                const countdownInterval = setInterval(() => {
+                    countdownTime--;
+                    
+                    // Tingsha sound at 7 seconds (transition signal)
+                    if (countdownTime === 7 && !soundPlayed) {
+                        self.playBellSound();
+                        soundPlayed = true;
+                    }
+                    
+                    if (countdownTime > 0) {
+                        countdownDisplay.textContent = countdownTime;
+                        // Add animation for pulse effect
+                        countdownDisplay.style.animation = 'none';
+                        setTimeout(() => {
+                            countdownDisplay.style.animation = 'countdown-pulse 0.6s ease-out';
+                        }, 10);
+                    } else {
+                        // Countdown finished, start actual meditation
+                        clearInterval(countdownInterval);
+                        countdownScreen.style.animation = 'fadeOut 0.3s ease';
+                        setTimeout(() => {
+                            countdownScreen.remove();
+                            self.beginMeditation();
+                        }, 300);
+                    }
+                }, 1000);
+            },
+
+            beginMeditation() {
                 this.isRunning = true;
                 this.isPaused = false;
                 this.sessionStartTime = Date.now() - (this.totalTime - this.timeRemaining) * 1000;
@@ -851,7 +979,7 @@
                     this.isPaused = false;
                     document.getElementById('pauseBtn').textContent = 'Pause';
                     document.getElementById('pauseBtn').onclick = () => this.pauseMeditation();
-                    this.startMeditation();
+                    this.beginMeditation();
                 }
             },
 
@@ -903,22 +1031,15 @@
             },
 
             playBellSound() {
-                // Generate a simple bell sound using Web Audio API
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                
-                osc.frequency.setValueAtTime(528, ctx.currentTime); // Healing frequency
-                osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 1);
-                
-                gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1);
-                
-                osc.start(ctx.currentTime);
-                osc.stop(ctx.currentTime + 1);
+                // Play Tingsha cymbal sound (CC0 by steffcaffrey)
+                const tingshaAudio = document.getElementById('tingshaAudio');
+                if (tingshaAudio) {
+                    tingshaAudio.volume = 0.8; // 80% volume
+                    tingshaAudio.currentTime = 0;
+                    tingshaAudio.play().catch(err => {
+                        console.log('Tingsha sound could not be played:', err);
+                    });
+                }
             },
 
             saveSession(session) {
