@@ -295,7 +295,8 @@
             });
             document.getElementById('optionsContainer').innerHTML = html;
             
-            document.getElementById('nextBtn').disabled = !answers[currentTestIdx + '-' + currentQ];
+            const key = currentTestIdx + '-' + currentQ;
+            document.getElementById('nextBtn').disabled = answers[key] === undefined;
         }
 
         function selectOption(idx) {
