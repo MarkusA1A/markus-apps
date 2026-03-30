@@ -945,19 +945,11 @@
                 document.getElementById('startBtn').disabled = true;
                 document.getElementById('pauseBtn').disabled = false;
 
-                // Play single bell when meditation starts
-                this.playBellSound();
-
-                // Schedule double bell at 10 seconds before end
-                const bellTime = (this.totalTime - 10) * 1000;
+                // Schedule bell at 5 seconds before end
+                const bellTime = (this.totalTime - 5) * 1000;
                 setTimeout(() => {
                     if (this.isRunning && !this.isPaused) {
-                        this.playBellSound(); // First bell
-                        setTimeout(() => {
-                            if (this.isRunning && !this.isPaused) {
-                                this.playBellSound(); // Second bell (1 second later)
-                            }
-                        }, 1000);
+                        this.playBellSound(); // Single bell
                     }
                 }, bellTime);
 
