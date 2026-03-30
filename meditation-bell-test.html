@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meditation Bell - Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+        button {
+            padding: 15px 40px;
+            font-size: 18px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px;
+        }
+        button:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .info {
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #2ecc71;
+            font-weight: bold;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔔 Meditation Bell Test</h1>
+        <p>Höre den Ton für das Ende der Meditationen:</p>
+        
+        <button onclick="playBell()">🔊 Bell abspielen</button>
+        
+        <div class="status" id="status"></div>
+        
+        <div class="info">
+            <p><strong>Beschreibung:</strong></p>
+            <p>Eine warme, resonante Glocke mit sanftem Sustain. Perfekt zum Beenden einer Meditation ohne zu erschrecken.</p>
+            <p style="font-size: 12px; margin-top: 20px; color: #999;">
+                Wenn dir der Ton gefällt → bestätige in Telegram<br>
+                Wenn nicht → sag mir eine Alternative!
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function playBell() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const now = audioContext.currentTime;
+            
+            // Meditation Bell - warm, resonant tone
+            const oscillator = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            
+            oscillator.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            // Bell frequency (around B4, 494 Hz) with harmonics
+            oscillator.frequency.setValueAtTime(494, now);
+            oscillator.frequency.exponentialRampToValueAtTime(300, now + 3);
+            oscillator.type = 'sine';
+            
+            // Volume envelope - starts loud, fades gradually
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.05, now + 0.5);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 3);
+            
+            oscillator.start(now);
+            oscillator.stop(now + 3);
+            
+            // Status feedback
+            document.getElementById('status').textContent = '🔔 Bell spielt...';
+            setTimeout(() => {
+                document.getElementById('status').textContent = '';
+            }, 3500);
+        }
+        
+        // Auto-play on load for quick test
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                // Uncomment to auto-play:
+                // playBell();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
