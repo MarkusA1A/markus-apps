@@ -841,6 +841,8 @@
                 this.setupNavigation();
                 this.registerServiceWorker();
                 this.initAudioContext();
+                // Ensure home section is visible at start
+                this.showSection('home');
                 console.log('Mindfulness App with 10-Second Countdown loaded');
             },
 
