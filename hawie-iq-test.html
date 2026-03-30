@@ -15,6 +15,8 @@
 
         :root {
             --primary: #6366f1;
+            --success: #10b981;
+            --danger: #ef4444;
             --bg: #f9fafb;
             --text: #1f2937;
         }
@@ -70,6 +72,11 @@
             cursor: not-allowed;
         }
 
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
         .option {
             padding: 1rem;
             margin: 0.5rem 0;
@@ -115,6 +122,14 @@
             margin-bottom: 1rem;
         }
 
+        .timer.warning {
+            background: #f59e0b;
+        }
+
+        .timer.danger {
+            background: var(--danger);
+        }
+
         .results {
             text-align: center;
         }
@@ -126,9 +141,70 @@
             margin: 1rem 0;
         }
 
+        /* Zahlenspanne */
+        .number-display {
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 2rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .number-input {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+
+        .number-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+
+        /* Bilderergänzung */
+        .image-preview {
+            width: 200px;
+            height: 200px;
+            margin: 1rem auto;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f4ff;
+        }
+
+        /* Blockdesign */
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f0f4ff;
+            border-radius: 8px;
+        }
+
+        .pattern-cell {
+            aspect-ratio: 1;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            border-radius: 4px;
+        }
+
         @media (max-width: 768px) {
             .card { padding: 1.5rem; }
             .iq-score { font-size: 2.5rem; }
+            .number-display { font-size: 2rem; }
         }
     </style>
 </head>
@@ -144,8 +220,16 @@
             <h2>Willkommen!</h2>
             <p style="margin: 1rem 0; line-height: 1.6;">
                 Dieser Test basiert auf dem <strong>HAWIE-R</strong> und dauert ca. 20-30 Minuten.
-                Er besteht aus 7 Untertests zu verschiedenen kognitiven Fähigkeiten.
+                Er besteht aus 6 Untertests zu verschiedenen kognitiven Fähigkeiten.
             </p>
+            <ul style="margin: 1rem 0 1rem 2rem; line-height: 1.8;">
+                <li><strong>Allgemeines Wissen</strong> — Faktenwissen</li>
+                <li><strong>Zahlenspanne</strong> — Arbeitsgedächtnis (merke Zahlenreihen!)</li>
+                <li><strong>Wortschatz</strong> — Sprachverständnis</li>
+                <li><strong>Bilderergänzung</strong> — Visuelle Wahrnehmung</li>
+                <li><strong>Blockdesign</strong> — Räumliches Denken</li>
+                <li><strong>Symbolsuche</strong> — Verarbeitungsgeschwindigkeit</li>
+            </ul>
             <p style="margin: 1rem 0; font-size: 0.9rem; color: #999;">
                 ⚠️ Nicht validiert - nur zu Unterhaltungszwecken
             </p>
@@ -162,7 +246,7 @@
                 <h3 id="subtestName">Allgemeines Wissen</h3>
                 <p id="questionNum">Frage 1 von 5</p>
                 <h4 id="questionText" style="margin: 1.5rem 0; font-size: 1.1rem;"></h4>
-                <div id="optionsContainer"></div>
+                <div id="testContent"></div>
                 <div style="margin-top: 2rem; display: flex; gap: 1rem;">
                     <button class="btn" onclick="prevQuestion()">← Zurück</button>
                     <button class="btn" onclick="nextQuestion()" id="nextBtn" disabled>Weiter →</button>
@@ -188,6 +272,7 @@
             {
                 name: 'Allgemeines Wissen',
                 timeLimit: 60,
+                type: 'multiple',
                 questions: [
                     { q: 'Wie viele Kontinente gibt es?', a: ['5', '6', '7', '8'], c: 2 },
                     { q: 'Was ist die Hauptstadt von Australien?', a: ['Sydney', 'Melbourne', 'Canberra', 'Brisbane'], c: 2 },
@@ -199,17 +284,19 @@
             {
                 name: 'Zahlenspanne',
                 timeLimit: 45,
+                type: 'number-recall',
                 questions: [
-                    { q: 'Zahlenfolge: 3-7-2', a: ['2-3-7', '3-7-2', '7-2-3', '7-3-2'], c: 1 },
-                    { q: 'Zahlenfolge: 5-1-8-4', a: ['1-4-5-8', '5-1-8-4', '4-8-1-5', '8-4-5-1'], c: 1 },
-                    { q: 'Zahlenfolge: 2-6-9-5-1', a: ['1-2-5-6-9', '2-6-9-5-1', '5-1-2-6-9', '9-6-5-2-1'], c: 1 },
-                    { q: 'Zahlenfolge: 7-3-8-1-4-6', a: ['1-3-4-6-7-8', '7-3-8-1-4-6', '6-4-1-8-3-7', '8-7-6-4-3-1'], c: 1 },
-                    { q: 'Zahlenfolge: 9-2-5-8-1-6-3', a: ['1-2-3-5-6-8-9', '9-2-5-8-1-6-3', '3-6-1-8-5-2-9', '9-8-6-5-3-2-1'], c: 1 }
+                    { q: 'Merke dir diese Zahlen für 3 Sekunden, dann gib sie ein:', numbers: [3, 7, 2], c: '3 7 2' },
+                    { q: 'Merke dir diese Zahlen für 3 Sekunden, dann gib sie ein:', numbers: [5, 1, 8, 4], c: '5 1 8 4' },
+                    { q: 'Merke dir diese Zahlen für 3 Sekunden, dann gib sie ein:', numbers: [2, 6, 9, 5, 1], c: '2 6 9 5 1' },
+                    { q: 'Merke dir diese Zahlen für 3 Sekunden, dann gib sie ein:', numbers: [7, 3, 8, 1, 4, 6], c: '7 3 8 1 4 6' },
+                    { q: 'Merke dir diese Zahlen für 3 Sekunden, dann gib sie ein:', numbers: [9, 2, 5, 8, 1, 6, 3], c: '9 2 5 8 1 6 3' }
                 ]
             },
             {
                 name: 'Wortschatz',
                 timeLimit: 60,
+                type: 'multiple',
                 questions: [
                     { q: 'Was bedeutet "Nostalgie"?', a: ['Lautstärke', 'Sehnsucht nach Vergangenem', 'Angststörung', 'Schlaflosigkeit'], c: 1 },
                     { q: 'Was bedeutet "ephemär"?', a: ['Dauerhaft', 'Flüchtig, kurzlebig', 'Hoch oben', 'Geheim'], c: 1 },
@@ -219,47 +306,39 @@
                 ]
             },
             {
-                name: 'Rechenaufgaben',
-                timeLimit: 90,
-                questions: [
-                    { q: 'Ein Buch kostet 15€, du zahlst 50€. Wieviel Wechselgeld?', a: ['30€', '35€', '45€', '25€'], c: 1 },
-                    { q: '3 Arbeiter brauchen 6h. 1 Arbeiter braucht wie lange?', a: ['2h', '9h', '12h', '18h'], c: 3 },
-                    { q: 'Was ist 25% von 120?', a: ['20', '25', '30', '40'], c: 2 },
-                    { q: 'Zug fährt 100 km/h für 2,5h. Wie weit?', a: ['200km', '250km', '300km', '350km'], c: 1 },
-                    { q: 'Wenn x + 15 = 42, was ist x?', a: ['25', '27', '29', '31'], c: 1 }
-                ]
-            },
-            {
                 name: 'Bilderergänzung',
                 timeLimit: 45,
+                type: 'image-complete',
                 questions: [
-                    { q: 'Was fehlt diesem Auto?', a: ['Räder', 'Fenster', 'Tür', 'Lenkrad'], c: 0 },
-                    { q: 'Was fehlt dieser Uhr?', a: ['Zeiger', 'Ziffern', 'Gehäuse', 'Batterie'], c: 0 },
-                    { q: 'Was fehlt dieser Hand?', a: ['Daumen', 'Finger', 'Handfläche', 'Gelenk'], c: 0 },
-                    { q: 'Was fehlt dieser Treppe?', a: ['Stufe', 'Geländer', 'Schatten', 'Winkel'], c: 0 },
-                    { q: 'Was fehlt diesem Haus?', a: ['Tür', 'Fenster', 'Dach', 'Rauch'], c: 0 }
+                    { q: 'Was fehlt diesem Auto?', image: '🚗', missing: ['Räder', 'Fenster', 'Tür', 'Lenkrad'], c: 0 },
+                    { q: 'Was fehlt dieser Uhr?', image: '🕐', missing: ['Zeiger', 'Ziffern', 'Gehäuse', 'Batterie'], c: 0 },
+                    { q: 'Was fehlt dieser Hand?', image: '🤚', missing: ['Daumen', 'Finger', 'Handfläche', 'Gelenk'], c: 0 },
+                    { q: 'Was fehlt diesem Haus?', image: '🏠', missing: ['Tür', 'Fenster', 'Dach', 'Rauch'], c: 0 },
+                    { q: 'Was fehlt diesem Gesicht?', image: '😊', missing: ['Augen', 'Nase', 'Mund', 'Ohren'], c: 1 }
                 ]
             },
             {
                 name: 'Blockdesign',
                 timeLimit: 60,
+                type: 'pattern-match',
                 questions: [
-                    { q: 'Wie viele Würfel für ein 3x3x3 Gitter?', a: ['18', '24', '27', '30'], c: 2 },
-                    { q: 'Welche Fläche sitzt gegenüber von rot?', a: ['Blau', 'Gelb', 'Grün', 'Weiß'], c: 1 },
-                    { q: 'Wie viele Kanten hat ein Würfel?', a: ['8', '10', '12', '14'], c: 2 },
-                    { q: 'Wie viele Ebenen hat ein Schachbrett?', a: ['1', '2', '3', '8'], c: 0 },
-                    { q: 'Rotiere L um 90°. Wie sieht es aus?', a: ['⌐', '⌞', '⌟', '⌜'], c: 2 }
+                    { q: 'Welches Muster passt am besten?', pattern: '██░██', a: ['██░██', '░██░░', '█░██░', '░░███'], c: 0 },
+                    { q: 'Welches Muster passt am besten?', pattern: '█░█░█', a: ['█░█░█', '░█░█░', '█░░░█', '░░░░░'], c: 0 },
+                    { q: 'Welches Muster passt am besten?', pattern: '████░', a: ['████░', '░████', '██░██', '█░░░█'], c: 0 },
+                    { q: 'Welches Muster passt am besten?', pattern: '█░░█░', a: ['█░░█░', '░█░█░', '░░██░', '█░█░█'], c: 0 },
+                    { q: 'Welches Muster passt am besten?', pattern: '██████', a: ['██████', '░░░░░░', '█░█░█░', '░█░█░█'], c: 0 }
                 ]
             },
             {
                 name: 'Symbolsuche',
                 timeLimit: 30,
+                type: 'symbol-find',
                 questions: [
-                    { q: 'Finde © in: ® © ™ ◆', a: ['Pos 1', 'Pos 2', 'Pos 3', 'Pos 4'], c: 1 },
-                    { q: 'Finde ★ in: ☆ ★ ✪ ✯', a: ['Pos 1', 'Pos 2', 'Pos 3', 'Pos 4'], c: 1 },
-                    { q: 'Finde ◆ in: ◇ □ ◆ ▪', a: ['Pos 1', 'Pos 2', 'Pos 3', 'Pos 4'], c: 2 },
-                    { q: 'Finde ▲ in: ▼ ◆ ▲ ✕', a: ['Pos 1', 'Pos 2', 'Pos 3', 'Pos 4'], c: 2 },
-                    { q: 'Finde § in: ¶ ¢ £ §', a: ['Pos 1', 'Pos 2', 'Pos 3', 'Pos 4'], c: 3 }
+                    { q: 'Finde © in dieser Liste:', list: '® © ™ ◆', target: '©', c: 'Position 2' },
+                    { q: 'Finde ★ in dieser Liste:', list: '☆ ★ ✪ ✯', target: '★', c: 'Position 2' },
+                    { q: 'Finde ◆ in dieser Liste:', list: '◇ □ ◆ ▪', target: '◆', c: 'Position 3' },
+                    { q: 'Finde ▲ in dieser Liste:', list: '▼ ◆ ▲ ✕', target: '▲', c: 'Position 3' },
+                    { q: 'Finde § in dieser Liste:', list: '¶ ¢ £ §', target: '§', c: 'Position 4' }
                 ]
             }
         ];
@@ -267,10 +346,14 @@
         let currentTestIdx = 0;
         let currentQ = 0;
         let answers = {};
-        let scores = {};
+        let timerInterval = null;
+        let timeLeft = 0;
+        let numberDisplay = false;
 
         function startTest() {
-            console.log('START TEST');
+            currentTestIdx = 0;
+            currentQ = 0;
+            answers = {};
             document.getElementById('startSection').classList.add('hidden');
             document.getElementById('testSection').classList.remove('hidden');
             showQuestion();
@@ -288,21 +371,87 @@
             document.getElementById('progressBar').style.width = (done / total * 100) + '%';
             
             let html = '';
-            q.a.forEach((opt, i) => {
-                const key = currentTestIdx + '-' + currentQ;
-                const selected = answers[key] === i ? 'selected' : '';
-                html += `<div class="option ${selected}" onclick="selectOption(${i})">${opt}</div>`;
-            });
-            document.getElementById('optionsContainer').innerHTML = html;
-            
+
+            if (test.type === 'multiple') {
+                q.a.forEach((opt, i) => {
+                    const key = currentTestIdx + '-' + currentQ;
+                    const selected = answers[key] === i ? 'selected' : '';
+                    html += `<div class="option ${selected}" onclick="selectOption(${i})">${opt}</div>`;
+                });
+            } else if (test.type === 'number-recall') {
+                html += `<div class="number-display" id="numberDisplay"></div>`;
+                html += `<p style="text-align: center; margin: 1rem 0; font-size: 0.9rem;">Gib die Zahlen mit Leerzeichen getrennt ein:</p>`;
+                html += `<input type="text" class="number-input" id="numberInput" placeholder="z.B. 3 7 2" onchange="selectOption(this.value)">`;
+            } else if (test.type === 'image-complete') {
+                html += `<div class="image-preview">${q.image}</div>`;
+                q.missing.forEach((opt, i) => {
+                    const key = currentTestIdx + '-' + currentQ;
+                    const selected = answers[key] === i ? 'selected' : '';
+                    html += `<div class="option ${selected}" onclick="selectOption(${i})">${opt}</div>`;
+                });
+            } else if (test.type === 'pattern-match') {
+                html += `<div style="text-align: center; margin: 1rem 0;">`;
+                q.pattern.split('').forEach(c => {
+                    html += c === '█' ? '■ ' : '□ ';
+                });
+                html += `</div>`;
+                q.a.forEach((opt, i) => {
+                    const key = currentTestIdx + '-' + currentQ;
+                    const selected = answers[key] === i ? 'selected' : '';
+                    html += `<div class="option ${selected}" onclick="selectOption(${i})">`;
+                    opt.split('').forEach(c => {
+                        html += c === '█' ? '■ ' : '□ ';
+                    });
+                    html += `</div>`;
+                });
+            } else if (test.type === 'symbol-find') {
+                html += `<div style="font-size: 1.5rem; text-align: center; margin: 1rem 0; letter-spacing: 0.5rem;">${q.list}</div>`;
+                const positions = ['Position 1', 'Position 2', 'Position 3', 'Position 4'];
+                positions.forEach((pos, i) => {
+                    const key = currentTestIdx + '-' + currentQ;
+                    const selected = answers[key] === pos ? 'selected' : '';
+                    html += `<div class="option ${selected}" onclick="selectOption('${pos}')">${pos}</div>`;
+                });
+            }
+
+            document.getElementById('testContent').innerHTML = html;
+
+            // Zahlenspanne: Zahlen zeigen und verstecken
+            if (test.type === 'number-recall') {
+                const numberDisplay = document.getElementById('numberDisplay');
+                const numberInput = document.getElementById('numberInput');
+                numberDisplay.textContent = q.numbers.join(' ');
+                setTimeout(() => {
+                    numberDisplay.textContent = '?';
+                    numberInput.focus();
+                }, 3000);
+            }
+
             const key = currentTestIdx + '-' + currentQ;
             document.getElementById('nextBtn').disabled = answers[key] === undefined;
+            
+            startTimer(test.timeLimit);
         }
 
-        function selectOption(idx) {
+        function selectOption(val) {
             const key = currentTestIdx + '-' + currentQ;
-            answers[key] = idx;
+            answers[key] = val;
             showQuestion();
+        }
+
+        function startTimer(seconds) {
+            clearInterval(timerInterval);
+            timeLeft = seconds;
+            const timerEl = document.getElementById('timer');
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = `⏱️ ${timeLeft}s`;
+                if (timeLeft <= 10) timerEl.className = 'timer danger';
+                else if (timeLeft <= 20) timerEl.className = 'timer warning';
+                if (timeLeft <= 0) {
+                    nextQuestion();
+                }
+            }, 1000);
         }
 
         function nextQuestion() {
@@ -330,12 +479,24 @@
         }
 
         function finishTest() {
-            // Calculate scores
+            clearInterval(timerInterval);
+            const scores = {};
             tests.forEach((test, tIdx) => {
                 let correct = 0;
                 test.questions.forEach((q, qIdx) => {
-                    if (answers[tIdx + '-' + qIdx] === q.c) {
-                        correct++;
+                    const key = tIdx + '-' + qIdx;
+                    if (test.type === 'number-recall') {
+                        if (answers[key] && answers[key].replace(/\s+/g, ' ').trim() === q.c.replace(/\s+/g, ' ').trim()) {
+                            correct++;
+                        }
+                    } else if (test.type === 'symbol-find') {
+                        if (answers[key] === q.c) {
+                            correct++;
+                        }
+                    } else {
+                        if (answers[key] === q.c) {
+                            correct++;
+                        }
                     }
                 });
                 scores[test.name] = Math.round(correct / test.questions.length * 100);
