@@ -1032,14 +1032,28 @@
             },
 
             playBellSound() {
-                // Play Tingsha cymbal sound (CC0 by steffcaffrey)
-                const tingshaAudio = document.getElementById('tingshaAudio');
-                if (tingshaAudio) {
-                    tingshaAudio.volume = 0.8; // 80% volume
-                    tingshaAudio.currentTime = 0;
-                    tingshaAudio.play().catch(err => {
-                        console.log('Tingsha sound could not be played:', err);
-                    });
+                // Play Tingsha-like bell sound using Web Audio API
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const now = audioContext.currentTime;
+                    
+                    // Main bell tone (D5, 587 Hz)
+                    const osc1 = audioContext.createOscillator();
+                    const gain1 = audioContext.createGain();
+                    osc1.connect(gain1);
+                    gain1.connect(audioContext.destination);
+                    
+                    osc1.frequency.setValueAtTime(587, now);
+                    osc1.frequency.exponentialRampToValueAtTime(520, now + 2);
+                    osc1.type = 'sine';
+                    
+                    gain1.gain.setValueAtTime(0.3, now);
+                    gain1.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+                    
+                    osc1.start(now);
+                    osc1.stop(now + 2.5);
+                } catch (err) {
+                    console.log('Bell sound could not be played:', err);
                 }
             },
 
