@@ -101,23 +101,23 @@
             gain3.connect(masterGain);
             masterGain.connect(audioContext.destination);
             
-            // Fundamental tone (around A4, 440 Hz) - HIGHER
-            osc1.frequency.setValueAtTime(440, now);
-            osc1.frequency.exponentialRampToValueAtTime(410, now + 5);
+            // Fundamental tone (around D5, 587 Hz) - EVEN HIGHER
+            osc1.frequency.setValueAtTime(587, now);
+            osc1.frequency.exponentialRampToValueAtTime(550, now + 5);
             osc1.type = 'sine';
             gain1.gain.setValueAtTime(0.25, now);
             gain1.gain.exponentialRampToValueAtTime(0.001, now + 5);
             
             // First harmonic (3x fundamental)
-            osc2.frequency.setValueAtTime(1320, now);
-            osc2.frequency.exponentialRampToValueAtTime(1230, now + 5);
+            osc2.frequency.setValueAtTime(1761, now);
+            osc2.frequency.exponentialRampToValueAtTime(1650, now + 5);
             osc2.type = 'sine';
             gain2.gain.setValueAtTime(0.15, now);
             gain2.gain.exponentialRampToValueAtTime(0.001, now + 5);
             
             // Second harmonic (5x fundamental) - adds warmth
-            osc3.frequency.setValueAtTime(2200, now);
-            osc3.frequency.exponentialRampToValueAtTime(2050, now + 5);
+            osc3.frequency.setValueAtTime(2935, now);
+            osc3.frequency.exponentialRampToValueAtTime(2750, now + 5);
             osc3.type = 'sine';
             gain3.gain.setValueAtTime(0.1, now);
             gain3.gain.exponentialRampToValueAtTime(0.001, now + 5);
