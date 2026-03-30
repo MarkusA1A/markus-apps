@@ -73,11 +73,11 @@
         }
 
         section {
-            display: none;
+            display: none !important;
         }
 
         section.active {
-            display: block;
+            display: block !important;
             animation: slideIn 0.3s ease;
         }
 
@@ -585,8 +585,11 @@
                 const key = `${this.currentSubtest}-${this.currentQuestion}`;
                 this.answers[key] = idx;
                 document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-                event.target.classList.add('selected');
-                document.getElementById('nextBtn').disabled = false;
+                if (event && event.target) {
+                    event.target.classList.add('selected');
+                }
+                const nextBtn = document.getElementById('nextBtn');
+                if (nextBtn) nextBtn.disabled = false;
             },
 
             canProceed() {
