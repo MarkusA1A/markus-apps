@@ -1063,14 +1063,33 @@
             },
 
             playBellSound() {
-                // Use Web Audio API directly (Safari iOS compatible)
-                this.playBellWithWebAudio();
+                // Try to play native audio element first (real bell recording)
+                try {
+                    const audio = document.getElementById('tingshaAudio');
+                    if (audio) {
+                        audio.currentTime = 0;
+                        audio.volume = 1.0;
+                        const playPromise = audio.play();
+                        if (playPromise) {
+                            playPromise.catch(err => {
+                                console.log('Native audio failed:', err.message);
+                                // Fallback to Web Audio
+                                this.playBellWithWebAudio();
+                            });
+                        }
+                    } else {
+                        this.playBellWithWebAudio();
+                    }
+                } catch (err) {
+                    console.log('Audio error:', err);
+                    this.playBellWithWebAudio();
+                }
             },
 
             testBellSound() {
                 // Test button - user interaction ensures audio works
                 console.log('🔔 Test button clicked');
-                this.playBellWithWebAudio();
+                this.playBellSound();
                 this.showNotification('🔔 Glocke gespielt — höre einen Ton?');
             },
             
