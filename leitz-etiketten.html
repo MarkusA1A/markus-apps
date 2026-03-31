@@ -64,14 +64,14 @@
         }
 
         main {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 2rem 1rem;
         }
 
         .container {
             display: grid;
-            grid-template-columns: 1fr 2fr;
+            grid-template-columns: 300px 1fr;
             gap: 2rem;
             margin-bottom: 2rem;
         }
@@ -115,6 +115,7 @@
             font-size: 1rem;
             background: var(--card-bg);
             color: var(--text);
+            font-family: inherit;
         }
 
         input:focus, textarea:focus, select:focus {
@@ -125,7 +126,7 @@
 
         textarea {
             resize: vertical;
-            min-height: 80px;
+            min-height: 60px;
         }
 
         .color-picker {
@@ -160,6 +161,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            font-family: inherit;
         }
 
         .btn-primary {
@@ -170,6 +172,10 @@
         .btn-primary:hover {
             background: #4338ca;
             transform: translateY(-2px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn-secondary {
@@ -202,109 +208,145 @@
         .btn-small {
             padding: 0.5rem 1rem;
             font-size: 0.9rem;
+            width: 100%;
         }
 
         .button-group {
             display: flex;
-            gap: 1rem;
+            flex-direction: column;
+            gap: 0.75rem;
             margin-top: 1.5rem;
-            flex-wrap: wrap;
         }
 
         .ordner-list {
-            max-height: 600px;
+            max-height: 400px;
             overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0;
         }
 
         .ordner-item {
             background: var(--bg);
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            border-radius: 8px;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
             border-left: 4px solid;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .ordner-item:last-child {
+            border-bottom: none;
         }
 
         .ordner-info {
             flex: 1;
+            min-width: 0;
         }
 
         .ordner-name {
             font-weight: 600;
-            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .ordner-category {
             font-size: 0.85rem;
             color: var(--text-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .ordner-actions {
             display: flex;
             gap: 0.5rem;
+            flex-shrink: 0;
         }
 
-        /* Etikett Vorschau */
-        .preview-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1rem;
+        .ordner-checkbox {
+            cursor: pointer;
+        }
+
+        /* Print Preview Container */
+        .print-preview-container {
+            background: white;
+            border: 1px dashed var(--border);
+            padding: 20px;
+            border-radius: 8px;
             margin-top: 1rem;
         }
 
-        .etikett {
-            /* Leitz Etikett: 61mm x 192mm = 2.4in x 7.56in */
-            width: 250px;
-            height: 95px;
-            border: 1px dashed var(--border);
-            border-radius: 4px;
-            padding: 1rem;
+        .print-page {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            position: relative;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        /* Leitz Etikett: 61mm breit × 192mm hoch */
+        /* Auf A4 passen 3 nebeneinander + mehrere untereinander */
+        .etikett-print {
+            position: absolute;
+            width: 61mm;
+            height: 192mm;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            position: relative;
-            font-size: 1.2rem;
+            padding: 5mm;
+            border: 1px solid #999;
             font-weight: 600;
+            font-size: 16px;
+            line-height: 1.3;
+            overflow: hidden;
             word-break: break-word;
+        }
+
+        /* Grid für Etiketten auf A4 (3 spalten) */
+        .etikett-preview {
+            width: 61mm;
+            height: 192mm;
+            border: 1px dashed var(--border);
+            padding: 4mm;
+            margin: 2mm;
+            display: inline-flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1.3;
             overflow: hidden;
             cursor: pointer;
-            transition: all 0.2s;
+            vertical-align: top;
+            word-break: break-word;
         }
 
-        .etikett:hover {
+        .etikett-preview:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
         }
 
-        .etikett.selected {
+        .etikett-preview.selected {
             box-shadow: 0 0 0 3px var(--primary);
             border-style: solid;
         }
 
-        .etikett-checkbox {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-
-        .toolbar {
+        .preview-grid {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
             flex-wrap: wrap;
-        }
-
-        .toolbar-group {
-            display: flex;
-            gap: 0.5rem;
+            gap: 0;
+            width: 100%;
+            justify-content: flex-start;
         }
 
         .stats {
@@ -328,6 +370,7 @@
         .stat-value {
             font-weight: 600;
             color: var(--primary);
+            font-size: 1.1rem;
         }
 
         .info-box {
@@ -337,13 +380,45 @@
             border-radius: 4px;
             margin-bottom: 1rem;
             font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        hr {
+            margin: 1.5rem 0;
+            border: none;
+            border-top: 1px solid var(--border);
         }
 
         @media print {
             body { background: white; }
-            header, .card, button, input, .toolbar, .info-box { display: none; }
-            .preview-section { display: block; }
-            .etikett { page-break-inside: avoid; }
+            header, .card:first-of-type, .toolbar, .info-box, .warning-box, button, input[type="checkbox"] { display: none; }
+            main { padding: 0; }
+            .card { box-shadow: none; border: none; padding: 0; }
+            .preview-grid { display: block; }
+            .etikett-preview { 
+                page-break-inside: avoid;
+                border: 1px solid #000;
+                margin: 0;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .etikett-preview {
+                width: 48%;
+            }
         }
 
         @media (max-width: 768px) {
@@ -351,13 +426,18 @@
                 grid-template-columns: 1fr;
             }
 
-            .preview-section {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            .card {
+                padding: 1.5rem;
             }
 
-            .etikett {
+            .etikett-preview {
                 width: 100%;
-                height: 80px;
+                height: auto;
+                min-height: 150px;
+            }
+
+            .btn-small {
+                padding: 0.75rem 1rem;
             }
         }
     </style>
@@ -365,7 +445,7 @@
 <body>
     <header>
         <h1>📁 Leitz Ordner-Etiketten</h1>
-        <p>Flexible Beschriftung für Ihre Ordner mit Leitz-Standard Etiketten</p>
+        <p>Flexible Beschriftung für Ihre Ordner mit Leitz-Standard Etiketten (61×192mm)</p>
     </header>
 
     <main>
@@ -381,7 +461,7 @@
 
                 <div class="form-group">
                     <label>Kategorie</label>
-                    <input type="text" id="ordnerCategory" placeholder="z.B. Finanzen, Projekte...">
+                    <input type="text" id="ordnerCategory" placeholder="z.B. Finanzen">
                 </div>
 
                 <div class="form-group">
@@ -392,7 +472,7 @@
                 <div class="form-group">
                     <label>Farbe</label>
                     <div class="color-picker">
-                        <div class="color-option selected" style="background: #ffffff; border: 2px solid #ccc;" onclick="selectColor('#ffffff')" title="Weiß"></div>
+                        <div class="color-option selected" style="background: #ffffff; border: 2px solid #999;" onclick="selectColor('#ffffff')" title="Weiß"></div>
                         <div class="color-option" style="background: #fef3c7;" onclick="selectColor('#fef3c7')" title="Gelb"></div>
                         <div class="color-option" style="background: #fecaca;" onclick="selectColor('#fecaca')" title="Rot"></div>
                         <div class="color-option" style="background: #bfdbfe;" onclick="selectColor('#bfdbfe')" title="Blau"></div>
@@ -401,9 +481,9 @@
                     </div>
                 </div>
 
-                <button class="btn btn-primary" onclick="addOrdner()">Ordner hinzufügen</button>
+                <button class="btn btn-primary" onclick="addOrdner()" style="width: 100%;">Hinzufügen</button>
 
-                <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
+                <hr>
 
                 <h3>Verwaltung</h3>
                 <div class="button-group">
@@ -412,25 +492,27 @@
                     <input type="file" id="importFile" style="display: none;" accept=".json" onchange="importData(event)">
                 </div>
 
+                <hr>
+
                 <h3>Druck</h3>
                 <div class="button-group">
-                    <button class="btn btn-success btn-small" onclick="printSelected()">🖨️ Ausgewählte drucken</button>
-                    <button class="btn btn-primary btn-small" onclick="selectAll()">Alle auswählen</button>
-                    <button class="btn btn-danger btn-small" onclick="deselectAll()">Keine auswählen</button>
+                    <button class="btn btn-success btn-small" onclick="printSelected()">🖨️ Drucken</button>
+                    <button class="btn btn-primary btn-small" onclick="selectAll()">Alle</button>
+                    <button class="btn btn-danger btn-small" onclick="deselectAll()">Keine</button>
                 </div>
             </div>
 
-            <!-- VORSCHAU & ETIKETTEN -->
+            <!-- VORSCHAU & LISTE -->
             <div>
                 <div class="card">
                     <h2>Ordner-Liste</h2>
                     <div class="stats">
                         <div class="stat-item">
-                            <div class="stat-label">Ordner:</div>
+                            <div class="stat-label">Gesamt:</div>
                             <div class="stat-value" id="totalCount">0</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-label">Zum Drucken:</div>
+                            <div class="stat-label">Drucken:</div>
                             <div class="stat-value" id="selectedCount">0</div>
                         </div>
                     </div>
@@ -440,10 +522,12 @@
                 <div class="card">
                     <h2>Etikett-Vorschau</h2>
                     <div class="info-box">
-                        💡 <strong>Leitz Standard:</strong> 61mm × 192mm Ordner-Rückenetikett. 
-                        Zum Drucken: Etiketten auswählen und auf "Drucken" klicken.
+                        ℹ️ <strong>Leitz Etikett:</strong> 61mm × 192mm (Ordner-Rückenetikett)
                     </div>
-                    <div class="preview-section" id="previewSection"></div>
+                    <div class="warning-box">
+                        💡 Klick auf ein Etikett zum Aus-/Abwählen. Dann "Drucken" für Druck vorbereiten.
+                    </div>
+                    <div class="preview-grid" id="previewGrid"></div>
                 </div>
             </div>
         </div>
@@ -489,9 +573,6 @@
             document.getElementById('ordnerName').value = '';
             document.getElementById('ordnerCategory').value = '';
             document.getElementById('ordnerExtra').value = '';
-            selectedColor = '#ffffff';
-            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
-            document.querySelector('.color-option[style*="ffffff"]').classList.add('selected');
         }
 
         function deleteOrdner(id) {
@@ -520,36 +601,46 @@
         function render() {
             // Liste
             const list = document.getElementById('ordnerList');
-            list.innerHTML = ordners.map(o => `
+            list.innerHTML = ordners.length === 0 ? '<div style="padding: 1rem; text-align: center; color: var(--text-light);">Keine Ordner eingetragen</div>' : ordners.map(o => `
                 <div class="ordner-item" style="border-left-color: ${o.color};">
                     <div class="ordner-info">
                         <div class="ordner-name">${o.name}</div>
                         ${o.category ? `<div class="ordner-category">${o.category}</div>` : ''}
                     </div>
-                    <div class="ordner-actions">
-                        <input type="checkbox" ${o.selected ? 'checked' : ''} onchange="toggleSelect(${o.id})">
-                        <button class="btn btn-danger btn-small" onclick="deleteOrdner(${o.id})">✕</button>
-                    </div>
+                    <input type="checkbox" class="ordner-checkbox" ${o.selected ? 'checked' : ''} onchange="toggleSelect(${o.id})">
+                    <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="deleteOrdner(${o.id})">✕</button>
                 </div>
             `).join('');
 
             // Vorschau
-            const preview = document.getElementById('previewSection');
+            const preview = document.getElementById('previewGrid');
             preview.innerHTML = ordners.map(o => `
-                <div class="etikett" style="background: ${o.color}; border-color: ${o.color === '#ffffff' ? '#999' : 'transparent'};" onclick="toggleSelect(${o.id})">
-                    <input type="checkbox" class="etikett-checkbox" ${o.selected ? 'checked' : ''} onchange="event.stopPropagation(); toggleSelect(${o.id})">
-                    <div><strong>${o.name}</strong></div>
-                    ${o.category ? `<div style="font-size: 0.8em; opacity: 0.7;">${o.category}</div>` : ''}
-                    ${o.extra ? `<div style="font-size: 0.8em; opacity: 0.7;">${o.extra}</div>` : ''}
+                <div class="etikett-preview" style="background: ${o.color}; ${o.color === '#ffffff' ? 'border-color: #999;' : ''}" onclick="toggleSelect(${o.id})">
+                    <div style="font-size: 1.1em;"><strong>${o.name}</strong></div>
+                    ${o.category ? `<div style="font-size: 0.75em; opacity: 0.8; margin-top: 4px;">${o.category}</div>` : ''}
+                    ${o.extra ? `<div style="font-size: 0.7em; opacity: 0.7; margin-top: 4px;">${o.extra}</div>` : ''}
                 </div>
             `).join('');
+
+            // Update Checkboxes visually
+            document.querySelectorAll('.etikett-preview').forEach((el, idx) => {
+                if (ordners[idx] && ordners[idx].selected) {
+                    el.classList.add('selected');
+                } else {
+                    el.classList.remove('selected');
+                }
+            });
 
             // Stats
             document.getElementById('totalCount').textContent = ordners.length;
             document.getElementById('selectedCount').textContent = ordners.filter(o => o.selected).length;
 
             // Speichern
-            localStorage.setItem('leitz-ordners', JSON.stringify(ordners));
+            try {
+                localStorage.setItem('leitz-ordners', JSON.stringify(ordners));
+            } catch (e) {
+                console.log('localStorage nicht verfügbar');
+            }
         }
 
         function printSelected() {
@@ -559,65 +650,90 @@
                 return;
             }
 
-            const printWindow = window.open('', '', 'width=800,height=600');
+            const printWindow = window.open('', 'print', 'width=850px,height=1100px');
+            
             let html = `
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Leitz Ordner-Etiketten Druck</title>
-                    <style>
-                        * { margin: 0; padding: 0; box-sizing: border-box; }
-                        body { font-family: Arial, sans-serif; }
-                        .page { width: 210mm; height: 297mm; padding: 10mm; }
-                        .etikett {
-                            width: 61mm;
-                            height: 192mm;
-                            border: 1px dashed #999;
-                            padding: 8mm;
-                            margin: 5mm;
-                            page-break-inside: avoid;
-                            display: inline-block;
-                            vertical-align: top;
-                            text-align: center;
-                            display: flex;
-                            flex-direction: column;
-                            justify-content: center;
-                            align-items: center;
-                            font-weight: bold;
-                            font-size: 14pt;
-                            overflow: hidden;
-                            word-break: break-word;
-                        }
-                        @media print {
-                            body { margin: 0; padding: 0; }
-                            .etikett { margin: 0; page-break-inside: avoid; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="page">
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Leitz Etiketten Druck</title>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { 
+                        font-family: Arial, sans-serif;
+                        padding: 0;
+                        margin: 0;
+                    }
+                    .page {
+                        width: 210mm;
+                        height: 297mm;
+                        padding: 5mm;
+                        page-break-after: always;
+                    }
+                    .etikett {
+                        width: 61mm;
+                        height: 192mm;
+                        border: 1px solid #000;
+                        padding: 4mm;
+                        margin: 0;
+                        display: inline-block;
+                        vertical-align: top;
+                        text-align: center;
+                        font-weight: bold;
+                        font-size: 14pt;
+                        line-height: 1.2;
+                        overflow: hidden;
+                        word-break: break-word;
+                        page-break-inside: avoid;
+                    }
+                    @page {
+                        margin: 0;
+                        size: A4;
+                    }
+                    @media print {
+                        body { margin: 0; padding: 0; }
+                        .page { margin: 0; padding: 0; }
+                    }
+                </style>
+            </head>
+            <body>
             `;
 
-            selected.forEach(o => {
+            // Gruppiere in Seiten (A4 passt ca. 1 Etikett pro Seite hochformat = 192mm)
+            let currentPageEtiketten = 0;
+            const etikettenProSeite = 1; // 1 Etikett pro A4-Seite im Hochformat
+
+            html += '<div class="page">';
+
+            selected.forEach((o, idx) => {
                 html += `
                     <div class="etikett" style="background: ${o.color};">
-                        <div><strong>${o.name}</strong></div>
-                        ${o.category ? `<div style="font-size: 0.8em; margin-top: 4mm;">${o.category}</div>` : ''}
-                        ${o.extra ? `<div style="font-size: 0.7em; margin-top: 4mm;">${o.extra}</div>` : ''}
+                        <div style="margin-bottom: 4mm;"><strong>${o.name}</strong></div>
+                        ${o.category ? `<div style="font-size: 0.9em; margin-bottom: 3mm;">${o.category}</div>` : ''}
+                        ${o.extra ? `<div style="font-size: 0.85em;">${o.extra}</div>` : ''}
                     </div>
                 `;
+
+                currentPageEtiketten++;
+                if (currentPageEtiketten >= etikettenProSeite && idx < selected.length - 1) {
+                    html += '</div><div class="page">';
+                    currentPageEtiketten = 0;
+                }
             });
 
             html += `
-                    </div>
-                </body>
-                </html>
+            </div>
+            </body>
+            </html>
             `;
 
             printWindow.document.write(html);
             printWindow.document.close();
+
             setTimeout(() => {
                 printWindow.print();
+                setTimeout(() => printWindow.close(), 500);
             }, 250);
         }
 
@@ -634,6 +750,7 @@
             a.href = url;
             a.download = `leitz-ordner-${new Date().toISOString().split('T')[0]}.json`;
             a.click();
+            URL.revokeObjectURL(url);
         }
 
         function importData(event) {
@@ -646,9 +763,10 @@
                     const data = JSON.parse(e.target.result);
                     ordners = data.ordners || [];
                     render();
-                    alert('Daten importiert!');
+                    alert(`✅ ${ordners.length} Ordner importiert!`);
+                    document.getElementById('importFile').value = '';
                 } catch (err) {
-                    alert('Fehler beim Importieren: ' + err.message);
+                    alert('❌ Fehler beim Importieren: ' + err.message);
                 }
             };
             reader.readAsText(file);
@@ -656,9 +774,13 @@
 
         // Initial load
         document.addEventListener('DOMContentLoaded', () => {
-            const saved = localStorage.getItem('leitz-ordners');
-            if (saved) {
-                ordners = JSON.parse(saved);
+            try {
+                const saved = localStorage.getItem('leitz-ordners');
+                if (saved) {
+                    ordners = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.log('localStorage nicht verfügbar - Daten werden nicht gespeichert');
             }
             render();
         });
