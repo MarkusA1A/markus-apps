@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Leitz Ordner-Etiketten Generator - Beschriften Sie Ihre Ordner flexibel">
+    <title>Leitz Ordner-Etiketten</title>
+    
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Leitz%20Ordner-Etiketten%22%2C%22short_name%22%3A%22Etiketten%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%234f46e5%22%7D">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%234f46e5' width='180' height='180'/%3E%3Ctext x='50%25' y='50%25' font-size='80' fill='white' text-anchor='middle' dominant-baseline='central'%3E📁%3C/text%3E%3C/svg%3E">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f9fafb;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #111827;
+                --card-bg: #1f2937;
+                --text: #f3f4f6;
+                --text-light: #d1d5db;
+                --border: #374151;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        h3 {
+            font-size: 1rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--text);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--card-bg);
+            color: var(--text);
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px white, 0 0 0 4px var(--primary);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--text-light);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--text);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .ordner-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .ordner-item {
+            background: var(--bg);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            border-left: 4px solid;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ordner-info {
+            flex: 1;
+        }
+
+        .ordner-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .ordner-category {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .ordner-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Etikett Vorschau */
+        .preview-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .etikett {
+            /* Leitz Etikett: 61mm x 192mm = 2.4in x 7.56in */
+            width: 250px;
+            height: 95px;
+            border: 1px dashed var(--border);
+            border-radius: 4px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            font-size: 1.2rem;
+            font-weight: 600;
+            word-break: break-word;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .etikett:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .etikett.selected {
+            box-shadow: 0 0 0 3px var(--primary);
+            border-style: solid;
+        }
+
+        .etikett-checkbox {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .stats {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            display: inline-block;
+            margin-right: 1.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        @media print {
+            body { background: white; }
+            header, .card, button, input, .toolbar, .info-box { display: none; }
+            .preview-section { display: block; }
+            .etikett { page-break-inside: avoid; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-section {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+
+            .etikett {
+                width: 100%;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📁 Leitz Ordner-Etiketten</h1>
+        <p>Flexible Beschriftung für Ihre Ordner mit Leitz-Standard Etiketten</p>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- EINGABE BEREICH -->
+            <div class="card">
+                <h2>Neuer Ordner</h2>
+                
+                <div class="form-group">
+                    <label>Ordnername *</label>
+                    <input type="text" id="ordnerName" placeholder="z.B. Rechnungen 2026">
+                </div>
+
+                <div class="form-group">
+                    <label>Kategorie</label>
+                    <input type="text" id="ordnerCategory" placeholder="z.B. Finanzen, Projekte...">
+                </div>
+
+                <div class="form-group">
+                    <label>Zusatztext (optional)</label>
+                    <textarea id="ordnerExtra" placeholder="z.B. Jan-Dez oder weitere Infos"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Farbe</label>
+                    <div class="color-picker">
+                        <div class="color-option selected" style="background: #ffffff; border: 2px solid #ccc;" onclick="selectColor('#ffffff')" title="Weiß"></div>
+                        <div class="color-option" style="background: #fef3c7;" onclick="selectColor('#fef3c7')" title="Gelb"></div>
+                        <div class="color-option" style="background: #fecaca;" onclick="selectColor('#fecaca')" title="Rot"></div>
+                        <div class="color-option" style="background: #bfdbfe;" onclick="selectColor('#bfdbfe')" title="Blau"></div>
+                        <div class="color-option" style="background: #bbf7d0;" onclick="selectColor('#bbf7d0')" title="Grün"></div>
+                        <div class="color-option" style="background: #e9d5ff;" onclick="selectColor('#e9d5ff')" title="Lila"></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="addOrdner()">Ordner hinzufügen</button>
+
+                <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
+
+                <h3>Verwaltung</h3>
+                <div class="button-group">
+                    <button class="btn btn-secondary btn-small" onclick="exportData()">📥 Exportieren</button>
+                    <button class="btn btn-secondary btn-small" onclick="document.getElementById('importFile').click()">📤 Importieren</button>
+                    <input type="file" id="importFile" style="display: none;" accept=".json" onchange="importData(event)">
+                </div>
+
+                <h3>Druck</h3>
+                <div class="button-group">
+                    <button class="btn btn-success btn-small" onclick="printSelected()">🖨️ Ausgewählte drucken</button>
+                    <button class="btn btn-primary btn-small" onclick="selectAll()">Alle auswählen</button>
+                    <button class="btn btn-danger btn-small" onclick="deselectAll()">Keine auswählen</button>
+                </div>
+            </div>
+
+            <!-- VORSCHAU & ETIKETTEN -->
+            <div>
+                <div class="card">
+                    <h2>Ordner-Liste</h2>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Ordner:</div>
+                            <div class="stat-value" id="totalCount">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Zum Drucken:</div>
+                            <div class="stat-value" id="selectedCount">0</div>
+                        </div>
+                    </div>
+                    <div class="ordner-list" id="ordnerList"></div>
+                </div>
+
+                <div class="card">
+                    <h2>Etikett-Vorschau</h2>
+                    <div class="info-box">
+                        💡 <strong>Leitz Standard:</strong> 61mm × 192mm Ordner-Rückenetikett. 
+                        Zum Drucken: Etiketten auswählen und auf "Drucken" klicken.
+                    </div>
+                    <div class="preview-section" id="previewSection"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let ordners = [];
+        let selectedColor = '#ffffff';
+
+        function selectColor(color) {
+            selectedColor = color;
+            document.querySelectorAll('.color-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function addOrdner() {
+            const name = document.getElementById('ordnerName').value.trim();
+            const category = document.getElementById('ordnerCategory').value.trim();
+            const extra = document.getElementById('ordnerExtra').value.trim();
+
+            if (!name) {
+                alert('Bitte geben Sie einen Ordnernamen ein');
+                return;
+            }
+
+            const ordner = {
+                id: Date.now(),
+                name: name,
+                category: category,
+                extra: extra,
+                color: selectedColor,
+                selected: false
+            };
+
+            ordners.push(ordner);
+            clearForm();
+            render();
+        }
+
+        function clearForm() {
+            document.getElementById('ordnerName').value = '';
+            document.getElementById('ordnerCategory').value = '';
+            document.getElementById('ordnerExtra').value = '';
+            selectedColor = '#ffffff';
+            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
+            document.querySelector('.color-option[style*="ffffff"]').classList.add('selected');
+        }
+
+        function deleteOrdner(id) {
+            ordners = ordners.filter(o => o.id !== id);
+            render();
+        }
+
+        function toggleSelect(id) {
+            const ordner = ordners.find(o => o.id === id);
+            if (ordner) {
+                ordner.selected = !ordner.selected;
+                render();
+            }
+        }
+
+        function selectAll() {
+            ordners.forEach(o => o.selected = true);
+            render();
+        }
+
+        function deselectAll() {
+            ordners.forEach(o => o.selected = false);
+            render();
+        }
+
+        function render() {
+            // Liste
+            const list = document.getElementById('ordnerList');
+            list.innerHTML = ordners.map(o => `
+                <div class="ordner-item" style="border-left-color: ${o.color};">
+                    <div class="ordner-info">
+                        <div class="ordner-name">${o.name}</div>
+                        ${o.category ? `<div class="ordner-category">${o.category}</div>` : ''}
+                    </div>
+                    <div class="ordner-actions">
+                        <input type="checkbox" ${o.selected ? 'checked' : ''} onchange="toggleSelect(${o.id})">
+                        <button class="btn btn-danger btn-small" onclick="deleteOrdner(${o.id})">✕</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Vorschau
+            const preview = document.getElementById('previewSection');
+            preview.innerHTML = ordners.map(o => `
+                <div class="etikett" style="background: ${o.color}; border-color: ${o.color === '#ffffff' ? '#999' : 'transparent'};" onclick="toggleSelect(${o.id})">
+                    <input type="checkbox" class="etikett-checkbox" ${o.selected ? 'checked' : ''} onchange="event.stopPropagation(); toggleSelect(${o.id})">
+                    <div><strong>${o.name}</strong></div>
+                    ${o.category ? `<div style="font-size: 0.8em; opacity: 0.7;">${o.category}</div>` : ''}
+                    ${o.extra ? `<div style="font-size: 0.8em; opacity: 0.7;">${o.extra}</div>` : ''}
+                </div>
+            `).join('');
+
+            // Stats
+            document.getElementById('totalCount').textContent = ordners.length;
+            document.getElementById('selectedCount').textContent = ordners.filter(o => o.selected).length;
+
+            // Speichern
+            localStorage.setItem('leitz-ordners', JSON.stringify(ordners));
+        }
+
+        function printSelected() {
+            const selected = ordners.filter(o => o.selected);
+            if (selected.length === 0) {
+                alert('Bitte wählen Sie mindestens ein Etikett zum Drucken aus');
+                return;
+            }
+
+            const printWindow = window.open('', '', 'width=800,height=600');
+            let html = `
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Leitz Ordner-Etiketten Druck</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { font-family: Arial, sans-serif; }
+                        .page { width: 210mm; height: 297mm; padding: 10mm; }
+                        .etikett {
+                            width: 61mm;
+                            height: 192mm;
+                            border: 1px dashed #999;
+                            padding: 8mm;
+                            margin: 5mm;
+                            page-break-inside: avoid;
+                            display: inline-block;
+                            vertical-align: top;
+                            text-align: center;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            font-weight: bold;
+                            font-size: 14pt;
+                            overflow: hidden;
+                            word-break: break-word;
+                        }
+                        @media print {
+                            body { margin: 0; padding: 0; }
+                            .etikett { margin: 0; page-break-inside: avoid; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="page">
+            `;
+
+            selected.forEach(o => {
+                html += `
+                    <div class="etikett" style="background: ${o.color};">
+                        <div><strong>${o.name}</strong></div>
+                        ${o.category ? `<div style="font-size: 0.8em; margin-top: 4mm;">${o.category}</div>` : ''}
+                        ${o.extra ? `<div style="font-size: 0.7em; margin-top: 4mm;">${o.extra}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                </body>
+                </html>
+            `;
+
+            printWindow.document.write(html);
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.print();
+            }, 250);
+        }
+
+        function exportData() {
+            const data = {
+                version: '1.0',
+                exported: new Date().toISOString(),
+                ordners: ordners
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `leitz-ordner-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    ordners = data.ordners || [];
+                    render();
+                    alert('Daten importiert!');
+                } catch (err) {
+                    alert('Fehler beim Importieren: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('leitz-ordners');
+            if (saved) {
+                ordners = JSON.parse(saved);
+            }
+            render();
+        });
+    </script>
+</body>
+</html>
