@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Leitz Ordner-Etiketten Generator - Beschriften Sie Ihre Ordner flexibel">
-    <title>Leitz Ordner-Etiketten</title>
+    <meta name="description" content="Leitz Ordner-Etiketten Generator mit Grafik & Textorientierung">
+    <title>Leitz Ordner-Etiketten Pro</title>
     
-    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Leitz%20Ordner-Etiketten%22%2C%22short_name%22%3A%22Etiketten%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%234f46e5%22%7D">
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Leitz%20Ordner-Etiketten%22%2C%22short_name%22%3A%22Etiketten%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%7D">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%234f46e5' width='180' height='180'/%3E%3Ctext x='50%25' y='50%25' font-size='80' fill='white' text-anchor='middle' dominant-baseline='central'%3E📁%3C/text%3E%3C/svg%3E">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --primary: #4f46e5;
@@ -42,7 +38,6 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
-            line-height: 1.6;
         }
 
         header {
@@ -50,18 +45,10 @@
             color: white;
             padding: 2rem;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-
-        header p {
-            opacity: 0.9;
-            font-size: 0.95rem;
-        }
+        header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        header p { opacity: 0.9; font-size: 0.95rem; }
 
         main {
             max-width: 1400px;
@@ -71,9 +58,8 @@
 
         .container {
             display: grid;
-            grid-template-columns: 300px 1fr;
+            grid-template-columns: 350px 1fr;
             gap: 2rem;
-            margin-bottom: 2rem;
         }
 
         .card {
@@ -84,17 +70,8 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        h2 {
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        h3 {
-            font-size: 1rem;
-            margin: 1.5rem 0 1rem;
-            color: var(--text);
-        }
+        h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--primary); }
+        h3 { font-size: 1rem; margin: 1.5rem 0 1rem; color: var(--text); }
 
         .form-group {
             margin-bottom: 1rem;
@@ -107,7 +84,7 @@
             font-size: 0.9rem;
         }
 
-        input, textarea, select {
+        input[type="text"], input[type="file"], textarea, select {
             width: 100%;
             padding: 0.75rem;
             border: 2px solid var(--border);
@@ -124,9 +101,18 @@
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 60px;
+        textarea { resize: vertical; min-height: 60px; }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .range-display {
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 0.5rem;
         }
 
         .color-picker {
@@ -144,13 +130,37 @@
             transition: all 0.2s;
         }
 
-        .color-option:hover {
-            transform: scale(1.1);
-        }
-
         .color-option.selected {
             border-color: var(--primary);
             box-shadow: 0 0 0 2px white, 0 0 0 4px var(--primary);
+        }
+
+        .option-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .option-btn {
+            padding: 0.5rem;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            background: var(--card-bg);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .option-btn.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
         }
 
         .btn {
@@ -164,46 +174,17 @@
             font-family: inherit;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #4338ca; }
 
-        .btn-primary:hover {
-            background: #4338ca;
-            transform: translateY(-2px);
-        }
+        .btn-secondary { background: var(--text-light); color: white; }
+        .btn-secondary:hover { background: var(--text); }
 
-        .btn-primary:active {
-            transform: translateY(0);
-        }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
 
-        .btn-secondary {
-            background: var(--text-light);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: var(--text);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
 
         .btn-small {
             padding: 0.5rem 1rem;
@@ -216,6 +197,21 @@
             flex-direction: column;
             gap: 0.75rem;
             margin-top: 1.5rem;
+        }
+
+        .graphic-preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg);
+            border-radius: 8px;
+            text-align: center;
+            min-height: 60px;
+        }
+
+        .graphic-preview img {
+            max-width: 100%;
+            max-height: 80px;
+            margin-bottom: 0.5rem;
         }
 
         .ordner-list {
@@ -238,29 +234,11 @@
             font-size: 0.9rem;
         }
 
-        .ordner-item:last-child {
-            border-bottom: none;
-        }
+        .ordner-item:last-child { border-bottom: none; }
 
-        .ordner-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .ordner-name {
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .ordner-category {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        .ordner-info { flex: 1; min-width: 0; }
+        .ordner-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ordner-category { font-size: 0.85rem; color: var(--text-light); }
 
         .ordner-actions {
             display: flex;
@@ -268,50 +246,6 @@
             flex-shrink: 0;
         }
 
-        .ordner-checkbox {
-            cursor: pointer;
-        }
-
-        /* Print Preview Container */
-        .print-preview-container {
-            background: white;
-            border: 1px dashed var(--border);
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 1rem;
-        }
-
-        .print-page {
-            width: 210mm;
-            height: 297mm;
-            background: white;
-            position: relative;
-            margin-bottom: 20px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-
-        /* Leitz Etikett: 61mm breit × 192mm hoch */
-        /* Auf A4 passen 3 nebeneinander + mehrere untereinander */
-        .etikett-print {
-            position: absolute;
-            width: 61mm;
-            height: 192mm;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 5mm;
-            border: 1px solid #999;
-            font-weight: 600;
-            font-size: 16px;
-            line-height: 1.3;
-            overflow: hidden;
-            word-break: break-word;
-        }
-
-        /* Grid für Etiketten auf A4 (3 spalten) */
         .etikett-preview {
             width: 61mm;
             height: 192mm;
@@ -323,22 +257,34 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            font-weight: 600;
-            font-size: 14px;
-            line-height: 1.3;
             overflow: hidden;
             cursor: pointer;
             vertical-align: top;
-            word-break: break-word;
-        }
-
-        .etikett-preview:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         .etikett-preview.selected {
             box-shadow: 0 0 0 3px var(--primary);
             border-style: solid;
+        }
+
+        .etikett-content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .etikett-image {
+            max-width: 90%;
+            max-height: 40%;
+            margin-bottom: 4px;
+        }
+
+        .etikett-text {
+            font-weight: 600;
+            word-break: break-word;
         }
 
         .preview-grid {
@@ -362,11 +308,6 @@
             margin-right: 1.5rem;
         }
 
-        .stat-label {
-            color: var(--text-light);
-            font-size: 0.85rem;
-        }
-
         .stat-value {
             font-weight: 600;
             color: var(--primary);
@@ -380,7 +321,6 @@
             border-radius: 4px;
             margin-bottom: 1rem;
             font-size: 0.9rem;
-            color: var(--text);
         }
 
         .warning-box {
@@ -392,65 +332,35 @@
             font-size: 0.9rem;
         }
 
-        hr {
-            margin: 1.5rem 0;
-            border: none;
-            border-top: 1px solid var(--border);
-        }
+        hr { margin: 1.5rem 0; border: none; border-top: 1px solid var(--border); }
 
         @media print {
-            body { background: white; }
-            header, .card:first-of-type, .toolbar, .info-box, .warning-box, button, input[type="checkbox"] { display: none; }
-            main { padding: 0; }
-            .card { box-shadow: none; border: none; padding: 0; }
+            header, .card:first-of-type, button, input, textarea, select { display: none; }
+            .container { grid-template-columns: 1fr; }
             .preview-grid { display: block; }
-            .etikett-preview { 
-                page-break-inside: avoid;
-                border: 1px solid #000;
-                margin: 0;
-            }
+            .etikett-preview { page-break-inside: avoid; border: 1px solid #000; margin: 0; }
         }
 
         @media (max-width: 1024px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-
-            .etikett-preview {
-                width: 48%;
-            }
+            .container { grid-template-columns: 1fr; }
+            .etikett-preview { width: 48%; }
         }
 
         @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-
-            .card {
-                padding: 1.5rem;
-            }
-
-            .etikett-preview {
-                width: 100%;
-                height: auto;
-                min-height: 150px;
-            }
-
-            .btn-small {
-                padding: 0.75rem 1rem;
-            }
+            .card { padding: 1.5rem; }
+            .etikett-preview { width: 100%; min-height: 150px; }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>📁 Leitz Ordner-Etiketten</h1>
-        <p>Flexible Beschriftung für Ihre Ordner mit Leitz-Standard Etiketten (61×192mm)</p>
+        <h1>📁 Leitz Ordner-Etiketten Pro</h1>
+        <p>Beschriftung mit Grafiken, Textorientierung & Schriftgröße</p>
     </header>
 
     <main>
         <div class="container">
-            <!-- EINGABE BEREICH -->
+            <!-- EINGABE -->
             <div class="card">
                 <h2>Neuer Ordner</h2>
                 
@@ -466,22 +376,50 @@
 
                 <div class="form-group">
                     <label>Zusatztext (optional)</label>
-                    <textarea id="ordnerExtra" placeholder="z.B. Jan-Dez oder weitere Infos"></textarea>
+                    <textarea id="ordnerExtra" placeholder="z.B. Jan-Dez"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label>Farbe</label>
                     <div class="color-picker">
-                        <div class="color-option selected" style="background: #ffffff; border: 2px solid #999;" onclick="selectColor('#ffffff')" title="Weiß"></div>
-                        <div class="color-option" style="background: #fef3c7;" onclick="selectColor('#fef3c7')" title="Gelb"></div>
-                        <div class="color-option" style="background: #fecaca;" onclick="selectColor('#fecaca')" title="Rot"></div>
-                        <div class="color-option" style="background: #bfdbfe;" onclick="selectColor('#bfdbfe')" title="Blau"></div>
-                        <div class="color-option" style="background: #bbf7d0;" onclick="selectColor('#bbf7d0')" title="Grün"></div>
-                        <div class="color-option" style="background: #e9d5ff;" onclick="selectColor('#e9d5ff')" title="Lila"></div>
+                        <div class="color-option selected" style="background: #ffffff; border: 2px solid #999;" onclick="selectColor('#ffffff')"></div>
+                        <div class="color-option" style="background: #fef3c7;" onclick="selectColor('#fef3c7')"></div>
+                        <div class="color-option" style="background: #fecaca;" onclick="selectColor('#fecaca')"></div>
+                        <div class="color-option" style="background: #bfdbfe;" onclick="selectColor('#bfdbfe')"></div>
+                        <div class="color-option" style="background: #bbf7d0;" onclick="selectColor('#bbf7d0')"></div>
+                        <div class="color-option" style="background: #e9d5ff;" onclick="selectColor('#e9d5ff')"></div>
                     </div>
                 </div>
 
-                <button class="btn btn-primary" onclick="addOrdner()" style="width: 100%;">Hinzufügen</button>
+                <div class="form-group">
+                    <label>Textorientierung</label>
+                    <div class="option-group">
+                        <button class="option-btn selected" onclick="selectOrientation('horizontal')">↔️ Horizontal</button>
+                        <button class="option-btn" onclick="selectOrientation('vertical')">↕️ Vertikal</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Schriftgröße: <span id="fontSizeDisplay">14</span>px</label>
+                    <input type="range" id="fontSize" min="10" max="24" value="14" oninput="updateFontSize()">
+                </div>
+
+                <div class="form-group">
+                    <label>Grafik (optional)</label>
+                    <input type="file" id="graphicFile" accept="image/*" onchange="handleGraphicUpload()">
+                    <div class="graphic-preview" id="graphicPreview"></div>
+                    ${graphicBase64 ? `<button class="btn btn-danger btn-small" onclick="removeGraphic()" style="margin-top: 0.5rem;">Grafik löschen</button>` : ''}
+                </div>
+
+                <div class="form-group">
+                    <label>Grafik Position</label>
+                    <div class="option-group">
+                        <button class="option-btn selected" onclick="selectGraphicPos('top')">⬆️ Oben</button>
+                        <button class="option-btn" onclick="selectGraphicPos('bottom')">⬇️ Unten</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="addOrdner()">Hinzufügen</button>
 
                 <hr>
 
@@ -502,18 +440,16 @@
                 </div>
             </div>
 
-            <!-- VORSCHAU & LISTE -->
+            <!-- VORSCHAU -->
             <div>
                 <div class="card">
                     <h2>Ordner-Liste</h2>
                     <div class="stats">
                         <div class="stat-item">
-                            <div class="stat-label">Gesamt:</div>
-                            <div class="stat-value" id="totalCount">0</div>
+                            Gesamt: <div class="stat-value" id="totalCount">0</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-label">Drucken:</div>
-                            <div class="stat-value" id="selectedCount">0</div>
+                            Drucken: <div class="stat-value" id="selectedCount">0</div>
                         </div>
                     </div>
                     <div class="ordner-list" id="ordnerList"></div>
@@ -522,10 +458,7 @@
                 <div class="card">
                     <h2>Etikett-Vorschau</h2>
                     <div class="info-box">
-                        ℹ️ <strong>Leitz Etikett:</strong> 61mm × 192mm (Ordner-Rückenetikett)
-                    </div>
-                    <div class="warning-box">
-                        💡 Klick auf ein Etikett zum Aus-/Abwählen. Dann "Drucken" für Druck vorbereiten.
+                        ℹ️ Leitz Etikett 61×192mm
                     </div>
                     <div class="preview-grid" id="previewGrid"></div>
                 </div>
@@ -536,20 +469,64 @@
     <script>
         let ordners = [];
         let selectedColor = '#ffffff';
+        let selectedOrientation = 'horizontal';
+        let selectedFontSize = 14;
+        let selectedGraphicPos = 'top';
+        let graphicBase64 = null;
 
         function selectColor(color) {
             selectedColor = color;
-            document.querySelectorAll('.color-option').forEach(el => {
-                el.classList.remove('selected');
-            });
+            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
             event.target.classList.add('selected');
+        }
+
+        function selectOrientation(orient) {
+            selectedOrientation = orient;
+            document.querySelectorAll('[onclick*="selectOrientation"]').forEach(el => el.classList.remove('selected'));
+            event.target.classList.add('selected');
+        }
+
+        function updateFontSize() {
+            selectedFontSize = parseInt(document.getElementById('fontSize').value);
+            document.getElementById('fontSizeDisplay').textContent = selectedFontSize;
+        }
+
+        function selectGraphicPos(pos) {
+            selectedGraphicPos = pos;
+            document.querySelectorAll('[onclick*="selectGraphicPos"]').forEach(el => el.classList.remove('selected'));
+            event.target.classList.add('selected');
+        }
+
+        function handleGraphicUpload() {
+            const file = document.getElementById('graphicFile').files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                graphicBase64 = e.target.result;
+                updateGraphicPreview();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateGraphicPreview() {
+            const preview = document.getElementById('graphicPreview');
+            if (graphicBase64) {
+                preview.innerHTML = `<img src="${graphicBase64}"><br><small>Grafik geladen</small>`;
+            } else {
+                preview.innerHTML = '';
+            }
+        }
+
+        function removeGraphic() {
+            graphicBase64 = null;
+            document.getElementById('graphicFile').value = '';
+            updateGraphicPreview();
+            render();
         }
 
         function addOrdner() {
             const name = document.getElementById('ordnerName').value.trim();
-            const category = document.getElementById('ordnerCategory').value.trim();
-            const extra = document.getElementById('ordnerExtra').value.trim();
-
             if (!name) {
                 alert('Bitte geben Sie einen Ordnernamen ein');
                 return;
@@ -558,21 +535,24 @@
             const ordner = {
                 id: Date.now(),
                 name: name,
-                category: category,
-                extra: extra,
+                category: document.getElementById('ordnerCategory').value.trim(),
+                extra: document.getElementById('ordnerExtra').value.trim(),
                 color: selectedColor,
+                orientation: selectedOrientation,
+                fontSize: selectedFontSize,
+                graphic: graphicBase64,
+                graphicPos: selectedGraphicPos,
                 selected: false
             };
 
             ordners.push(ordner);
-            clearForm();
-            render();
-        }
-
-        function clearForm() {
             document.getElementById('ordnerName').value = '';
             document.getElementById('ordnerCategory').value = '';
             document.getElementById('ordnerExtra').value = '';
+            document.getElementById('graphicFile').value = '';
+            graphicBase64 = null;
+            updateGraphicPreview();
+            render();
         }
 
         function deleteOrdner(id) {
@@ -601,41 +581,53 @@
         function render() {
             // Liste
             const list = document.getElementById('ordnerList');
-            list.innerHTML = ordners.length === 0 ? '<div style="padding: 1rem; text-align: center; color: var(--text-light);">Keine Ordner eingetragen</div>' : ordners.map(o => `
-                <div class="ordner-item" style="border-left-color: ${o.color};">
-                    <div class="ordner-info">
-                        <div class="ordner-name">${o.name}</div>
-                        ${o.category ? `<div class="ordner-category">${o.category}</div>` : ''}
+            list.innerHTML = ordners.length === 0 
+                ? '<div style="padding: 1rem; text-align: center; color: var(--text-light);">Keine Ordner</div>'
+                : ordners.map(o => `
+                    <div class="ordner-item" style="border-left-color: ${o.color};">
+                        <div class="ordner-info">
+                            <div class="ordner-name">${o.name}</div>
+                            ${o.category ? `<div class="ordner-category">${o.category}</div>` : ''}
+                        </div>
+                        <input type="checkbox" ${o.selected ? 'checked' : ''} onchange="toggleSelect(${o.id})">
+                        <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="deleteOrdner(${o.id})">✕</button>
                     </div>
-                    <input type="checkbox" class="ordner-checkbox" ${o.selected ? 'checked' : ''} onchange="toggleSelect(${o.id})">
-                    <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="deleteOrdner(${o.id})">✕</button>
-                </div>
-            `).join('');
+                `).join('');
 
             // Vorschau
             const preview = document.getElementById('previewGrid');
-            preview.innerHTML = ordners.map(o => `
-                <div class="etikett-preview" style="background: ${o.color}; ${o.color === '#ffffff' ? 'border-color: #999;' : ''}" onclick="toggleSelect(${o.id})">
-                    <div style="font-size: 1.1em;"><strong>${o.name}</strong></div>
-                    ${o.category ? `<div style="font-size: 0.75em; opacity: 0.8; margin-top: 4px;">${o.category}</div>` : ''}
-                    ${o.extra ? `<div style="font-size: 0.7em; opacity: 0.7; margin-top: 4px;">${o.extra}</div>` : ''}
-                </div>
-            `).join('');
+            preview.innerHTML = ordners.map(o => {
+                const textRotation = o.orientation === 'vertical' ? 'transform: rotate(-90deg);' : '';
+                const textStyle = `font-size: ${o.fontSize}px; ${textRotation}`;
+                
+                let content = `
+                    <div style="${o.graphicPos === 'top' && o.graphic ? 'order: -1;' : ''}">
+                        ${o.graphic ? `<img class="etikett-image" src="${o.graphic}">` : ''}
+                    </div>
+                    <div class="etikett-text" style="${textStyle}">
+                        <strong>${o.name}</strong>
+                        ${o.category ? `<div style="font-size: 0.8em;">${o.category}</div>` : ''}
+                        ${o.extra ? `<div style="font-size: 0.7em;">${o.extra}</div>` : ''}
+                    </div>
+                `;
 
-            // Update Checkboxes visually
+                return `
+                    <div class="etikett-preview" style="background: ${o.color};" onclick="toggleSelect(${o.id})">
+                        <div class="etikett-content">
+                            ${content}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update classes
             document.querySelectorAll('.etikett-preview').forEach((el, idx) => {
-                if (ordners[idx] && ordners[idx].selected) {
-                    el.classList.add('selected');
-                } else {
-                    el.classList.remove('selected');
-                }
+                el.classList.toggle('selected', ordners[idx] && ordners[idx].selected);
             });
 
-            // Stats
             document.getElementById('totalCount').textContent = ordners.length;
             document.getElementById('selectedCount').textContent = ordners.filter(o => o.selected).length;
 
-            // Speichern
             try {
                 localStorage.setItem('leitz-ordners', JSON.stringify(ordners));
             } catch (e) {
@@ -646,91 +638,53 @@
         function printSelected() {
             const selected = ordners.filter(o => o.selected);
             if (selected.length === 0) {
-                alert('Bitte wählen Sie mindestens ein Etikett zum Drucken aus');
+                alert('Bitte wählen Sie mindestens ein Etikett');
                 return;
             }
 
-            const printWindow = window.open('', 'print', 'width=850px,height=1100px');
+            const printWindow = window.open('', 'print');
             
-            let html = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>Leitz Etiketten Druck</title>
-                <style>
-                    * { margin: 0; padding: 0; box-sizing: border-box; }
-                    body { 
-                        font-family: Arial, sans-serif;
-                        padding: 0;
-                        margin: 0;
-                    }
-                    .page {
-                        width: 210mm;
-                        height: 297mm;
-                        padding: 5mm;
-                        page-break-after: always;
-                    }
-                    .etikett {
-                        width: 61mm;
-                        height: 192mm;
-                        border: 1px solid #000;
-                        padding: 4mm;
-                        margin: 0;
-                        display: inline-block;
-                        vertical-align: top;
-                        text-align: center;
-                        font-weight: bold;
-                        font-size: 14pt;
-                        line-height: 1.2;
-                        overflow: hidden;
-                        word-break: break-word;
-                        page-break-inside: avoid;
-                    }
-                    @page {
-                        margin: 0;
-                        size: A4;
-                    }
-                    @media print {
-                        body { margin: 0; padding: 0; }
-                        .page { margin: 0; padding: 0; }
-                    }
-                </style>
-            </head>
-            <body>
-            `;
-
-            // Gruppiere in Seiten (A4 passt ca. 1 Etikett pro Seite hochformat = 192mm)
-            let currentPageEtiketten = 0;
-            const etikettenProSeite = 1; // 1 Etikett pro A4-Seite im Hochformat
-
-            html += '<div class="page">';
+            let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Leitz Druck</title><style>
+                * { margin: 0; padding: 0; }
+                body { font-family: Arial, sans-serif; }
+                .page { width: 210mm; height: 297mm; padding: 5mm; }
+                .etikett {
+                    width: 61mm; height: 192mm;
+                    border: 1px solid #000;
+                    padding: 4mm;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
+                    page-break-inside: avoid;
+                    margin-bottom: 5mm;
+                }
+                .etikett-image { max-width: 90%; max-height: 40%; margin-bottom: 4mm; }
+                @page { margin: 0; size: A4; }
+                @media print { body { margin: 0; padding: 0; } }
+            </style></head><body><div class="page">`;
 
             selected.forEach((o, idx) => {
+                const textRotation = o.orientation === 'vertical' ? 'style="transform: rotate(-90deg);"' : '';
                 html += `
                     <div class="etikett" style="background: ${o.color};">
-                        <div style="margin-bottom: 4mm;"><strong>${o.name}</strong></div>
-                        ${o.category ? `<div style="font-size: 0.9em; margin-bottom: 3mm;">${o.category}</div>` : ''}
-                        ${o.extra ? `<div style="font-size: 0.85em;">${o.extra}</div>` : ''}
+                        ${o.graphic ? `<img class="etikett-image" src="${o.graphic}">` : ''}
+                        <div ${textRotation} style="font-size: ${o.fontSize}pt; font-weight: bold;">
+                            ${o.name}<br>
+                            ${o.category ? `<small>${o.category}</small><br>` : ''}
+                            ${o.extra ? `<small>${o.extra}</small>` : ''}
+                        </div>
                     </div>
                 `;
-
-                currentPageEtiketten++;
-                if (currentPageEtiketten >= etikettenProSeite && idx < selected.length - 1) {
+                if ((idx + 1) % 1 === 0 && idx < selected.length - 1) {
                     html += '</div><div class="page">';
-                    currentPageEtiketten = 0;
                 }
             });
 
-            html += `
-            </div>
-            </body>
-            </html>
-            `;
-
+            html += `</div></body></html>`;
             printWindow.document.write(html);
             printWindow.document.close();
-
             setTimeout(() => {
                 printWindow.print();
                 setTimeout(() => printWindow.close(), 500);
@@ -739,7 +693,7 @@
 
         function exportData() {
             const data = {
-                version: '1.0',
+                version: '2.0',
                 exported: new Date().toISOString(),
                 ordners: ordners
             };
@@ -748,7 +702,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `leitz-ordner-${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `leitz-${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -766,21 +720,18 @@
                     alert(`✅ ${ordners.length} Ordner importiert!`);
                     document.getElementById('importFile').value = '';
                 } catch (err) {
-                    alert('❌ Fehler beim Importieren: ' + err.message);
+                    alert('❌ Fehler: ' + err.message);
                 }
             };
             reader.readAsText(file);
         }
 
-        // Initial load
         document.addEventListener('DOMContentLoaded', () => {
             try {
                 const saved = localStorage.getItem('leitz-ordners');
-                if (saved) {
-                    ordners = JSON.parse(saved);
-                }
+                if (saved) ordners = JSON.parse(saved);
             } catch (e) {
-                console.log('localStorage nicht verfügbar - Daten werden nicht gespeichert');
+                console.log('localStorage nicht verfügbar');
             }
             render();
         });
